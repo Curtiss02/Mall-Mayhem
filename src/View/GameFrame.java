@@ -23,4 +23,8 @@ public class GameFrame extends JFrame {
         setResizable(false);
         pack();
     }
+
+    public GUIPanel getMyGUIPanel() {
+        return myGUIPanel;
+    }
 }

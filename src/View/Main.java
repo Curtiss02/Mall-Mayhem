@@ -11,7 +11,7 @@ public class Main {
         EventQueue.invokeLater(() -> {
             GameFrame mainFrame = new GameFrame();
             GameController controller = new GameController();
-            controller.setView(mainFrame.myGUIPanel);
+            controller.setView(mainFrame.getMyGUIPanel());
 
         });
 
