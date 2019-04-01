@@ -1,5 +1,7 @@
 package View;
 
+import Controller.GameController;
+
 import java.awt.EventQueue;
 
 
@@ -8,6 +10,8 @@ public class Main {
 
         EventQueue.invokeLater(() -> {
             GameFrame mainFrame = new GameFrame();
+            GameController controller = new GameController();
+            controller.setView(mainFrame.myGUIPanel);
 
         });
 
