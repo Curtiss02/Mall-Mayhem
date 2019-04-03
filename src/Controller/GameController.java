@@ -33,9 +33,6 @@ public class GameController {
         @Override
         public void actionPerformed(ActionEvent e) {
 
-            view.tick();
-
-
         }
     };
 }

@@ -3,14 +3,10 @@ import View.Sprite;
 
 public class Character {
     int x, y;
+    int dx, dy;
     int width, height;
     Sprite sprite;
-    enum direction {
-        LEFT,
-        RIGHT,
-        UP,
-        DOWN
-    }
+    int direction;
 
     public int getX() {
         return x;

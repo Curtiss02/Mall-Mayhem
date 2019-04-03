@@ -10,8 +10,6 @@ public class Main {
 
         EventQueue.invokeLater(() -> {
             GameFrame mainFrame = new GameFrame();
-            GameController controller = new GameController();
-            controller.setView(mainFrame.getMyGUIPanel());
 
         });
 
