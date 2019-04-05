@@ -1,14 +1,16 @@
 package View;
 
 import javax.swing.*;
+import java.awt.*;
 
 public class GameFrame extends JFrame {
 
     public GUIPanel myGUIPanel;
     public GameFrame(){
         super("Mall Mayhem");
-        myGUIPanel = new GUIPanel();
-
+        EventQueue.invokeLater(() -> {
+            myGUIPanel = new GUIPanel();
+        });
         start();
 
     }

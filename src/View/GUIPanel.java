@@ -4,6 +4,12 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.security.Key;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class GUIPanel extends JPanel {
 
@@ -11,10 +17,12 @@ public class GUIPanel extends JPanel {
     private final int GAME_WIDTH = 1400;
     private final int GAME_HEIGHT = 900;
 
-    //Setup GUI Timer. Used for refreshing the screen
-    private Timer GUITimer;
-    //Sets refresh rate, 16ms ~= 60fps
-    private final int FRAME_DELAY = 16;
+
+    private Boolean keyPresses[];
+    private List<Sprite> spriteList;
+
+    String fpsCounter;
+
     private int frameNum = 0;
 
 
@@ -23,12 +31,21 @@ public class GUIPanel extends JPanel {
         this.setVisible(true);
         this.setPreferredSize(new Dimension(GAME_WIDTH, GAME_HEIGHT));
 
-        setBackground(Color.white);
+        fpsCounter = "FPS: 0 UPS: 0";
+
+        spriteList= new ArrayList<Sprite>();
+
+        addKeyListener(new TAdapter());
+
+        keyPresses = new Boolean[256];
+        Arrays.fill(keyPresses, Boolean.FALSE);
+
+
+        setBackground(Color.WHITE);
         //Panel must be focusable in order to accept user input
         setFocusable(true);
 
-        GUITimer = new Timer(FRAME_DELAY, gameTimer);
-        GUITimer.start();
+
 
     }
 
@@ -38,27 +55,73 @@ public class GUIPanel extends JPanel {
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
         drawFrames(g);
+        drawSprites(g2d);
+        drawFPS(g);
+
         Toolkit.getDefaultToolkit().sync();
 
 
     }
+    public void Update(){
+        repaint();
 
-    //This is the function that is called every frame, is used for updating GUI elements
-    ActionListener gameTimer = new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            repaint();
-            if (frameNum > 60) {
-                frameNum = 0;
-            } else {
-                frameNum++;
+        if (frameNum > 60) {
+            frameNum = 0;
+        } else {
+            frameNum++;
+        }
+
+
+    }
+
+    public void UpdateFPS(int fps, int tps){
+
+        StringBuilder fps_counter_build = new StringBuilder();
+        fps_counter_build.append("FPS: ");
+        fps_counter_build.append(fps);
+        fps_counter_build.append(" UPS: ");
+        fps_counter_build.append(tps);
+        fpsCounter = fps_counter_build.toString();
+
+    }
+
+    public void setSpriteList(List<Sprite> spriteList){
+        this.spriteList = spriteList;
+    }
+
+    private void drawSprites(Graphics2D g){
+        for(int i = 0; i < spriteList.size(); i++){
+            Sprite thisSprite = spriteList.get(i);
+            if (thisSprite.isVisible()){
+                thisSprite.drawSprite(g);
             }
         }
-    };
+    }
+
+    private void drawFPS(Graphics g){
+        g.drawString(fpsCounter, 1, 30);
+    }
 
     private void drawFrames(Graphics g) {
-
         g.drawString(Integer.toString(frameNum), getWidth() / 2, getHeight() / 2);
+    }
 
+    private class TAdapter extends KeyAdapter {
+
+        @Override
+        public void keyReleased(KeyEvent e) {
+            System.out.println("KeyReleased");
+            keyPresses[e.getKeyCode()] = false;
+        }
+
+        @Override
+        public void keyPressed(KeyEvent e) {
+            System.out.println("KeyPressed");
+            keyPresses[e.getKeyCode()] = true;
+        }
+    }
+
+    public Boolean[] getKeyPresses() {
+        return keyPresses;
     }
 }

@@ -2,16 +2,21 @@ package View;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import javax.imageio.*;
+import java.io.File;
+import java.io.IOException;
 
 public class Sprite {
     //
     private int x, y;
     private int width, height;
     private boolean isVisible;
-    private Image image;
+    private BufferedImage image;
 
-    public Sprite(){
-
+    public Sprite(int x, int y){
+        this.x = x;
+        this.y = y;
+        isVisible = true;
     }
 
 
@@ -43,7 +48,17 @@ public class Sprite {
         return image;
     }
 
-    public void setImage(Image image) {
-        this.image = image;
+    public void drawSprite(Graphics2D g){
+        g.drawImage(image, x, y, null);
+    }
+
+    //Loads the image specified in s to a BufferedImage
+    public void setImage(String s){
+
+        try {
+            image = ImageIO.read(new File(s));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
