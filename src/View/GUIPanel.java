@@ -17,11 +17,14 @@ public class GUIPanel extends JPanel {
     private final int GAME_WIDTH = 1400;
     private final int GAME_HEIGHT = 900;
 
+    //Stores current keyboard information
+    // true == pressed
+    // false == released
+    private Boolean[] keyPresses;
 
-    private Boolean keyPresses[];
     private List<Sprite> spriteList;
 
-    String fpsCounter;
+    private String fpsCounter;
 
     private int frameNum = 0;
 
@@ -35,6 +38,7 @@ public class GUIPanel extends JPanel {
 
         spriteList= new ArrayList<Sprite>();
 
+        // Must add key listener to panel in order to actually receive keybaord inputs
         addKeyListener(new TAdapter());
 
         keyPresses = new Boolean[256];
@@ -110,13 +114,11 @@ public class GUIPanel extends JPanel {
 
         @Override
         public void keyReleased(KeyEvent e) {
-            System.out.println("KeyReleased");
             keyPresses[e.getKeyCode()] = false;
         }
 
         @Override
         public void keyPressed(KeyEvent e) {
-            System.out.println("KeyPressed");
             keyPresses[e.getKeyCode()] = true;
         }
     }

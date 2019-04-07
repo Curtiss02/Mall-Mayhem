@@ -24,21 +24,20 @@ public class GameController {
     private final int TICK_DELAY = 16;
     private final int FPS = 60;
     private final int UPS = 120;
-    private int frameNum = 0;
+
+    //Defines whether the game is running or not, used for the main game loop
     private boolean running;
 
-
     private Player player;
-    GUIPanel view;
+
+    //Must load the view into the controller
+    private GUIPanel view;
 
 
-    //Create arraylists for game objects
-    List<Sprite> spriteList;
+    //Create arraylists for game objects, is shared with the view
+    private List<Sprite> spriteList;
 
-    public GameController() {
-
-
-    }
+    public GameController() {}
 
     public void setView(GUIPanel view) {
         this.view = view;
@@ -50,11 +49,11 @@ public class GameController {
         gameLoop();
     }
 
-    public void gameLoop() {
+    private void gameLoop() {
 
         long startTime = System.nanoTime();
-        final double updateTime = 1000000000 / UPS;
-        final double frameTime = 1000000000 / FPS;
+        final double updateTime = (double)1000000000 / UPS;
+        final double frameTime = (double)1000000000 / FPS;
         double deltaU = 0, deltaF = 0;
         int frames = 0, ticks = 0;
         long timer = System.currentTimeMillis();
@@ -94,42 +93,31 @@ public class GameController {
 
 
     private void init(){
-
+        //Create a new player
         player = new Player(100, 100);
 
         spriteList = new ArrayList<Sprite>();
-
+        //Add to list of sprites being drawn
         spriteList.add(player.getSprite());
-
-//        for(int i = 0; i < 100; i++){
-//            Random rand = new Random();
-//
-//            int rand_y = rand.nextInt(1440 + 1);
-//            int rand_x = rand.nextInt(900 + 1);
-//            Sprite newSprite = new Sprite(rand_x, rand_y);
-//            newSprite.setImage("src/img/blackblob.png");
-//
-//            spriteList.add(newSprite);
-//
-//        }
 
         view.setSpriteList(spriteList);
     }
 
-
+    // Will evetually include function which will tick() trough every currentl used entity
     private void update(){
-        //tickSprites();
         player.tick();
     }
 
     private void getInput(){
 
+        //Contains information on current status of keyboard input
         Boolean[] keyPresses =  view.getKeyPresses();
 
         player.stop();
 
         if (keyPresses[KeyEvent.VK_LEFT]) {
-            player.moveLeft();
+            player.moveLeft();        tickSprites();
+
         }
         if (keyPresses[KeyEvent.VK_RIGHT]) {
             player.moveRight();
@@ -176,8 +164,30 @@ public class GameController {
             }
 
         }
+        int i = 0;
+        while(i < spriteList.size()){
+            if(spriteList.get(i).isVisible() == false){
+                spriteList.remove(i);
+            }
+            else{
+                i++;
+            }
+        }
 
 
+    }
+    private void createClusterFuck(){
+        for(int i = 0; i < 10000; i++){
+            Random rand = new Random();
+
+            int rand_y = rand.nextInt(1440 + 1);
+            int rand_x = rand.nextInt(900 + 1);
+            Sprite newSprite = new Sprite(rand_x, rand_y);
+            newSprite.setImage("src/img/blackblob.png");
+
+            spriteList.add(newSprite);
+
+        }
     }
 }
 

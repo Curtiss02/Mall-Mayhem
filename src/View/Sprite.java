@@ -48,6 +48,8 @@ public class Sprite {
         return image;
     }
 
+    //Will draw the image stored in the sprite onto the graphics canvas passed through
+    //Should oly be accessed from View
     public void drawSprite(Graphics2D g){
         g.drawImage(image, x, y, null);
     }

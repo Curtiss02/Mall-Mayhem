@@ -17,6 +17,7 @@ public class Player extends Character {
     public void setSprite(String s){
         sprite.setImage(s);
     }
+
     public int getDirection(){
         return this.direction;
     }
@@ -47,6 +48,7 @@ public class Player extends Character {
         dy = 4;
     }
 
+    //Applys any movement that has been processed through player input
     public void tick(){
         x += dx;
         y += dy;
