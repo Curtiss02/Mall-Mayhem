@@ -14,6 +14,7 @@ import java.util.Random;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.RecursiveAction;
 
 
 public class GameController {
@@ -36,6 +37,10 @@ public class GameController {
 
     //Create arraylists for game objects, is shared with the view
     private List<Sprite> spriteList;
+
+    // Keep an list of enemy
+    private List<Enemy> enemyList;
+
 
     public GameController() {}
 
@@ -97,15 +102,78 @@ public class GameController {
         player = new Player(100, 100);
 
         spriteList = new ArrayList<Sprite>();
+        enemyList = new ArrayList<Enemy>();
         //Add to list of sprites being drawn
         spriteList.add(player.getSprite());
 
+        Shopper testShopper = new Shopper(250, 250);
+        testShopper.addPatrolPoint(new Point(500, 500));
+        testShopper.addPatrolPoint(new Point(300, 100));
+        testShopper.addPatrolPoint(new Point(900, 700));
+        enemyList.add(testShopper);
+        spriteList.add(testShopper.getSprite());
         view.setSpriteList(spriteList);
     }
 
     // Will evetually include function which will tick() trough every currentl used entity
     private void update(){
+
+        moveEnemies();
+
+        checkCollisions();
+
         player.tick();
+
+        tickEnemies();
+    }
+
+
+
+    private void checkCollisions(){
+        Rectangle playerBound = player.getFutureBounds();
+        //If the playe currently has collision disabled, we dont need to check
+        if(player.hasCollision()) {
+            for (Enemy thisEnemy : enemyList) {
+                Rectangle enemyBound = thisEnemy.getFutureBounds();
+                if (playerBound.intersects(enemyBound)) {
+
+                    //Should probably not stop player in event of enemy collision, just take damage + invuln for small time
+
+                    //Temporary just for now
+                    player.stop();
+                    thisEnemy.stop();
+                    break;
+                }
+            }
+        }
+
+        for(int i = 0; i < enemyList.size(); i++) {
+            if (enemyList.get(i).hasCollision()) {
+                Rectangle firstEnemyBounds = enemyList.get(i).getFutureBounds();
+                for (int j = i + 1; j < enemyList.size(); j++) {
+                    Rectangle secondEnemyBound = enemyList.get(i).getFutureBounds();
+                    if (firstEnemyBounds.intersects(secondEnemyBound)) {
+                        enemyList.get(i).stop();
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    private void moveEnemies(){
+        for(Enemy thisEnemy : enemyList){
+            thisEnemy.move();
+        }
+    }
+
+    //Updates enemy coords after verifying collision
+    private void tickEnemies(){
+
+        for (Enemy thisEnemy  : enemyList) {
+            thisEnemy.tick();
+        }
+
     }
 
     private void getInput(){
