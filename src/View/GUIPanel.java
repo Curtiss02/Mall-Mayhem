@@ -14,7 +14,7 @@ import java.util.List;
 public class GUIPanel extends JPanel {
 
     //Define game window width and height
-    private final int GAME_WIDTH = 1400;
+    private final int GAME_WIDTH = 1440;
     private final int GAME_HEIGHT = 900;
 
     //Stores current keyboard information
