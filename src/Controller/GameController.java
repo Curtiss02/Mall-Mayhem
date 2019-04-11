@@ -99,6 +99,12 @@ public class GameController {
 
     private void init(){
         //Create a new player
+
+        Level testLevel = new Level();
+
+        testLevel.loadXML("src/maps/room1.xml");
+
+
         player = new Player(100, 100);
 
         spriteList = new ArrayList<Sprite>();
@@ -106,12 +112,24 @@ public class GameController {
         //Add to list of sprites being drawn
         spriteList.add(player.getSprite());
 
+
         Shopper testShopper = new Shopper(250, 250);
         testShopper.addPatrolPoint(new Point(500, 500));
         testShopper.addPatrolPoint(new Point(300, 100));
         testShopper.addPatrolPoint(new Point(900, 700));
+
+        Shopper shopper2 = new Shopper(900, 900);
+        shopper2.addPatrolPoint(new Point(50,100));
+        shopper2.addPatrolPoint(new Point(100,100));
+        shopper2.addPatrolPoint(new Point(200,0));
+        shopper2.addPatrolPoint(new Point(394,983));
+        shopper2.addPatrolPoint(new Point(900,700));
+
         enemyList.add(testShopper);
+        enemyList.add(shopper2);
+
         spriteList.add(testShopper.getSprite());
+        spriteList.add(shopper2.getSprite());
         view.setSpriteList(spriteList);
     }
 
@@ -132,16 +150,21 @@ public class GameController {
     private void checkCollisions(){
         Rectangle playerBound = player.getFutureBounds();
         //If the playe currently has collision disabled, we dont need to check
-        if(player.hasCollision()) {
+        if(!player.isInvulnerable()) {
             for (Enemy thisEnemy : enemyList) {
                 Rectangle enemyBound = thisEnemy.getFutureBounds();
                 if (playerBound.intersects(enemyBound)) {
 
                     //Should probably not stop player in event of enemy collision, just take damage + invuln for small time
-
+                    System.out.println("PLAYER HIT");
                     //Temporary just for now
-                    player.stop();
-                    thisEnemy.stop();
+
+                    //int xDir = (player.getX() - thisEnemy.getX()) / Math.abs(player.getX() - thisEnemy.getX());
+                    //int yDir = (player.getY() - thisEnemy.getY()) / Math.abs(player.getY() - thisEnemy.getY());
+
+                    //player.knockBack(xDir, yDir, 20);
+
+                    player.setInvulnerable(true);
                     break;
                 }
             }
@@ -151,8 +174,9 @@ public class GameController {
             if (enemyList.get(i).hasCollision()) {
                 Rectangle firstEnemyBounds = enemyList.get(i).getFutureBounds();
                 for (int j = i + 1; j < enemyList.size(); j++) {
-                    Rectangle secondEnemyBound = enemyList.get(i).getFutureBounds();
+                    Rectangle secondEnemyBound = enemyList.get(j).getFutureBounds();
                     if (firstEnemyBounds.intersects(secondEnemyBound)) {
+
                         enemyList.get(i).stop();
                         break;
                     }

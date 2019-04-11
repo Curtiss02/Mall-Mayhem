@@ -36,6 +36,14 @@ public class Sprite {
         this.y = y;
     }
 
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
     public boolean isVisible() {
         return isVisible;
     }
@@ -62,5 +70,7 @@ public class Sprite {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        width = image.getWidth();
+        height = image.getHeight();
     }
 }
