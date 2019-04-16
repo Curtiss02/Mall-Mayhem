@@ -2,6 +2,7 @@ package Model;
 
 import javax.imageio.ImageIO;
 import javax.xml.parsers.*;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.ArrayList;
@@ -16,19 +17,24 @@ public class Level {
     private BufferedImage collisionLayer;
     private BufferedImage topLayer;
     private List<TileSet> tilesets;
+
     private int tileWidth;
     private int levelWidth;
     private int levelHeight;
 
+    private int[][] backgroundTileData;
+    private int[][] collisionTileData;
+    private int[][] topTileData;
 
-    public Level(){
 
+    public Level(String xmlFile){
+        loadXML(xmlFile);
     }
 
     public void loadTileset(){
 
     }
-    public void loadXML(String xmlFile) {
+    private void loadXML(String xmlFile) {
 
 /*
         if(tileSet == null) {
@@ -69,43 +75,119 @@ public class Level {
 
                     int imageWidth = Integer.valueOf(image.getAttribute("width"));
                     int imageHeight = Integer.valueOf(image.getAttributes().getNamedItem("height").getNodeValue());
-
+                    String imageSrc = image.getAttribute("source");
 
 
 
 
                     int firstGID = Integer.valueOf(tilesetNode.getAttribute("firstgid"));
                     String tilesetName = tilesetNode.getAttribute("name");
+
                     int tileWidth = Integer.valueOf(tilesetNode.getAttribute("tilewidth"));
                     int tileHeight = Integer.valueOf(tilesetNode.getAttribute("tileheight"));
-                    String imageSrc = tilesetNode.getAttribute("source");
+
 
                     TileSet currentTileset = new TileSet(imageWidth, imageHeight, firstGID, tilesetName, tileWidth, tileHeight, imageSrc);
                     tilesets.add(currentTileset);
                 }
 
-                /*
 
-                   xml = new XML(e.target.data);
-                   mapWidth = xml.attribute("width");
-                   mapHeight = xml.attribute("height");
-                   tileWidth = xml.attribute("tilewidth");
-                   tileHeight = xml.attribute("tileheight");
-                   var xmlCounter:uint = 0;
+                NodeList layers =  map.getElementsByTagName("layer");
 
-                   for each (var tileset:XML in xml.tileset) {
-                      var imageWidth:uint = xml.tileset.image.attribute("width")[xmlCounter];
-                      var imageHeight:uint = xml.tileset.image.attribute("height")[xmlCounter];
-                      var firstGid:uint = xml.tileset.attribute("firstgid")[xmlCounter];
-                      var tilesetName:String = xml.tileset.attribute("name")[xmlCounter];
-                      var tilesetTileWidth:uint = xml.tileset.attribute("tilewidth")[xmlCounter];
-                      var tilesetTileHeight:uint = xml.tileset.attribute("tileheight")[xmlCounter];
-                      var tilesetImagePath:String = xml.tileset.image.attribute("source")[xmlCounter];
-                      tileSets.push(new TileSet(firstGid, tilesetName, tilesetTileWidth, tilesetTileHeight, tilesetImagePath, imageWidth, imageHeight));
-                      xmlCounter++;
-                   }
-                   totalTileSets = xmlCounter;
-                 */
+                for(int i = 0; i < layers.getLength(); i++){
+                    Element currentLayer = (Element)layers.item(i);
+                    String layerName = currentLayer.getAttribute("name");
+
+                    BufferedImage currentImage = new BufferedImage(levelWidth*tileWidth, levelHeight*tileWidth, BufferedImage.TYPE_INT_ARGB);
+                    int[][] tileData;
+
+                    //Parse each of the tiles in the layer out of XML ad into an arrayList
+                    NodeList tiles = currentLayer.getElementsByTagName("tile");
+                    List<Integer> linearTiles = new ArrayList<Integer>();
+
+                    for(int tileNum = 0; tileNum < tiles.getLength(); tileNum++) {
+                        //Get current tile ID and convert to integer provided th value is not null
+                        //Add the current tile ID to a linear list
+                        String gid = ((Element) (tiles.item(tileNum))).getAttribute("gid");
+                        if (!gid.isEmpty()) {
+                            linearTiles.add(tileNum, Integer.valueOf(gid));
+                        } else {
+                            linearTiles.add(tileNum, 0);
+                        }
+
+                    }
+
+                    tileData = new int[levelWidth][];
+                    for(int tileX = 0; tileX  < levelWidth; tileX++){
+
+                        tileData[tileX] = new int[levelHeight];
+
+                        System.out.printf("[");
+
+                        for(int tileY = 0; tileY < levelHeight; tileY++){
+                            tileData[tileX][tileY] = linearTiles.get((tileX+(tileY*levelWidth)));
+
+                        }
+                        System.out.printf("]\n");
+
+                    }
+
+                    //Draw the fucking image please god i hope this works or im gonna cry
+
+                    Graphics gIMG = currentImage.getGraphics();
+                    for(int tileX = 0; tileX < levelWidth; tileX++ ){
+
+                        for(int tileY = 0; tileY < levelHeight; tileY++){
+
+                            int GID = tileData[tileX][tileY];
+
+                            //NO need to draw anything if the current tile is blank
+                            if(GID == 0) continue;
+                            TileSet currentTileset = tilesets.get(0);
+                            for(TileSet testSet : tilesets){
+                                if(GID >= testSet.getFirstGID()-1 && GID <= testSet.getLastGID()){
+                                    currentTileset = testSet;
+                                    break;
+                                }
+                            }
+                            GID -= currentTileset.getFirstGID()-1;
+                            int destX = tileX * tileWidth;
+                            int destY = tileY * tileWidth;
+                            //Draw the tile
+
+                            gIMG.drawImage(currentTileset.getTile(GID), destX, destY, null);
+
+
+                        }
+                    }
+
+                    switch (layerName){
+                        case "Background":
+                            backgroundLayer = currentImage;
+                            backgroundTileData = tileData;
+                            break;
+                        case "Collision":
+                            collisionLayer = currentImage;
+                            collisionTileData = tileData;
+                            break;
+                        case "Top":
+                            topLayer = currentImage;
+                            topTileData = tileData;
+                            break;
+                        default:
+                            break;
+                    }
+
+
+                    gIMG.dispose();
+                }
+
+                    File outputfile = new File("saved.png");
+                    ImageIO.write(backgroundLayer, "png", outputfile);
+
+
+;
+
 
 
             } catch (Exception e) {
@@ -113,6 +195,14 @@ public class Level {
             }
             }
     //}
+        private void buildLayer(BufferedImage layerImage, int[][] layerData){
+
+        }
+
+        public void drawBackground(Graphics2D g){
+            g.drawImage(backgroundLayer, 0 , 0, null);
+            g.drawImage(collisionLayer, 0, 0, null);
+        }
 
 }
 

@@ -35,6 +35,8 @@ public class GameController {
     private GUIPanel view;
 
 
+    private Level currentLevel;
+
     //Create arraylists for game objects, is shared with the view
     private List<Sprite> spriteList;
 
@@ -100,10 +102,9 @@ public class GameController {
     private void init(){
         //Create a new player
 
-        Level testLevel = new Level();
+        Level testLevel = new Level("src/maps/room1.xml");
 
-        testLevel.loadXML("src/maps/room1.xml");
-
+        view.setCurrentLevel(testLevel);
 
         player = new Player(100, 100);
 

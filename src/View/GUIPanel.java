@@ -1,5 +1,7 @@
 package View;
 
+import Model.Level;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -23,6 +25,8 @@ public class GUIPanel extends JPanel {
     private Boolean[] keyPresses;
 
     private List<Sprite> spriteList;
+
+    private Level currentLevel;
 
     private String fpsCounter;
 
@@ -58,6 +62,9 @@ public class GUIPanel extends JPanel {
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
+        if(currentLevel != null) {
+            currentLevel.drawBackground(g2d);
+        }
         drawFrames(g);
         drawSprites(g2d);
         drawFPS(g);
@@ -100,6 +107,10 @@ public class GUIPanel extends JPanel {
                 thisSprite.drawSprite(g);
             }
         }
+    }
+
+    public void setCurrentLevel(Level currentLevel) {
+        this.currentLevel = currentLevel;
     }
 
     private void drawFPS(Graphics g){
