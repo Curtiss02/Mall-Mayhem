@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.w3c.dom.*;
+import org.w3c.dom.css.Rect;
 
 public class Level {
 
@@ -17,6 +18,7 @@ public class Level {
     private BufferedImage collisionLayer;
     private BufferedImage topLayer;
     private List<TileSet> tilesets;
+    private List<Rectangle> collisions;
 
     private int tileWidth;
     private int levelWidth;
@@ -27,13 +29,14 @@ public class Level {
     private int[][] topTileData;
 
 
-    public Level(String xmlFile){
+    public Level(String xmlFile) {
         loadXML(xmlFile);
     }
 
-    public void loadTileset(){
+    public void loadTileset() {
 
     }
+
     private void loadXML(String xmlFile) {
 
 /*
@@ -44,165 +47,175 @@ public class Level {
 */
         try {
 
-                //Read in map data XML file
-                File inputFile = new File(xmlFile);
-                DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-                DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-                Document doc = dBuilder.parse(inputFile);
-                doc.getDocumentElement().normalize();
+            //Read in map data XML file
+            File inputFile = new File(xmlFile);
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+            Document doc = dBuilder.parse(inputFile);
+            doc.getDocumentElement().normalize();
 
-                Element map = (Element)doc.getElementsByTagName("map").item(0);
+            Element map = (Element) doc.getElementsByTagName("map").item(0);
 
-                tileWidth = Integer.valueOf(map.getAttribute("tilewidth"));
-                levelWidth = Integer.valueOf(map.getAttribute("width"));
-                levelHeight = Integer.valueOf(map.getAttribute("height"));
+            tileWidth = Integer.valueOf(map.getAttribute("tilewidth"));
+            levelWidth = Integer.valueOf(map.getAttribute("width"));
+            levelHeight = Integer.valueOf(map.getAttribute("height"));
 
-                NodeList tilesetNodes = doc.getElementsByTagName("tileset");
-                tilesets = new ArrayList<TileSet>();
-
-
-                for(int i = 0; i < tilesetNodes.getLength(); i++){
-                    System.out.println("Accessing" + i);
-                    Node tempNode = tilesetNodes.item(0);
-                    Element tilesetNode = (Element)tilesetNodes.item(i);
+            NodeList tilesetNodes = doc.getElementsByTagName("tileset");
+            tilesets = new ArrayList<TileSet>();
 
 
-
-                    Element image =  (Element)tilesetNode.getElementsByTagName("image").item(0);
-
-
-
-
-                    int imageWidth = Integer.valueOf(image.getAttribute("width"));
-                    int imageHeight = Integer.valueOf(image.getAttributes().getNamedItem("height").getNodeValue());
-                    String imageSrc = image.getAttribute("source");
+            for (int i = 0; i < tilesetNodes.getLength(); i++) {
+                System.out.println("Accessing" + i);
+                Node tempNode = tilesetNodes.item(0);
+                Element tilesetNode = (Element) tilesetNodes.item(i);
 
 
+                Element image = (Element) tilesetNode.getElementsByTagName("image").item(0);
 
 
-                    int firstGID = Integer.valueOf(tilesetNode.getAttribute("firstgid"));
-                    String tilesetName = tilesetNode.getAttribute("name");
-
-                    int tileWidth = Integer.valueOf(tilesetNode.getAttribute("tilewidth"));
-                    int tileHeight = Integer.valueOf(tilesetNode.getAttribute("tileheight"));
+                int imageWidth = Integer.valueOf(image.getAttribute("width"));
+                int imageHeight = Integer.valueOf(image.getAttributes().getNamedItem("height").getNodeValue());
+                String imageSrc = image.getAttribute("source");
 
 
-                    TileSet currentTileset = new TileSet(imageWidth, imageHeight, firstGID, tilesetName, tileWidth, tileHeight, imageSrc);
-                    tilesets.add(currentTileset);
+                int firstGID = Integer.valueOf(tilesetNode.getAttribute("firstgid"));
+                String tilesetName = tilesetNode.getAttribute("name");
+
+                int tileWidth = Integer.valueOf(tilesetNode.getAttribute("tilewidth"));
+                int tileHeight = Integer.valueOf(tilesetNode.getAttribute("tileheight"));
+
+
+                TileSet currentTileset = new TileSet(imageWidth, imageHeight, firstGID, tilesetName, tileWidth, tileHeight, imageSrc);
+                tilesets.add(currentTileset);
+            }
+
+
+            NodeList layers = map.getElementsByTagName("layer");
+
+            for (int i = 0; i < layers.getLength(); i++) {
+                Element currentLayer = (Element) layers.item(i);
+                String layerName = currentLayer.getAttribute("name");
+
+                BufferedImage currentImage = new BufferedImage(levelWidth * tileWidth, levelHeight * tileWidth, BufferedImage.TYPE_INT_ARGB);
+                int[][] tileData;
+
+                //Parse each of the tiles in the layer out of XML ad into an arrayList
+                NodeList tiles = currentLayer.getElementsByTagName("tile");
+                List<Integer> linearTiles = new ArrayList<Integer>();
+
+                for (int tileNum = 0; tileNum < tiles.getLength(); tileNum++) {
+                    //Get current tile ID and convert to integer provided th value is not null
+                    //Add the current tile ID to a linear list
+                    String gid = ((Element) (tiles.item(tileNum))).getAttribute("gid");
+                    if (!gid.isEmpty()) {
+                        linearTiles.add(tileNum, Integer.valueOf(gid));
+                    } else {
+                        linearTiles.add(tileNum, 0);
+                    }
+
                 }
 
+                tileData = new int[levelWidth][];
+                for (int tileX = 0; tileX < levelWidth; tileX++) {
 
-                NodeList layers =  map.getElementsByTagName("layer");
+                    tileData[tileX] = new int[levelHeight];
 
-                for(int i = 0; i < layers.getLength(); i++){
-                    Element currentLayer = (Element)layers.item(i);
-                    String layerName = currentLayer.getAttribute("name");
+                    System.out.printf("[");
 
-                    BufferedImage currentImage = new BufferedImage(levelWidth*tileWidth, levelHeight*tileWidth, BufferedImage.TYPE_INT_ARGB);
-                    int[][] tileData;
-
-                    //Parse each of the tiles in the layer out of XML ad into an arrayList
-                    NodeList tiles = currentLayer.getElementsByTagName("tile");
-                    List<Integer> linearTiles = new ArrayList<Integer>();
-
-                    for(int tileNum = 0; tileNum < tiles.getLength(); tileNum++) {
-                        //Get current tile ID and convert to integer provided th value is not null
-                        //Add the current tile ID to a linear list
-                        String gid = ((Element) (tiles.item(tileNum))).getAttribute("gid");
-                        if (!gid.isEmpty()) {
-                            linearTiles.add(tileNum, Integer.valueOf(gid));
-                        } else {
-                            linearTiles.add(tileNum, 0);
-                        }
+                    for (int tileY = 0; tileY < levelHeight; tileY++) {
+                        tileData[tileX][tileY] = linearTiles.get((tileX + (tileY * levelWidth)));
 
                     }
+                    System.out.printf("]\n");
 
-                    tileData = new int[levelWidth][];
-                    for(int tileX = 0; tileX  < levelWidth; tileX++){
+                }
 
-                        tileData[tileX] = new int[levelHeight];
+                //Draw the fucking image please god i hope this works or im gonna cry
 
-                        System.out.printf("[");
+                Graphics gIMG = currentImage.getGraphics();
+                for (int tileX = 0; tileX < levelWidth; tileX++) {
 
-                        for(int tileY = 0; tileY < levelHeight; tileY++){
-                            tileData[tileX][tileY] = linearTiles.get((tileX+(tileY*levelWidth)));
+                    for (int tileY = 0; tileY < levelHeight; tileY++) {
 
-                        }
-                        System.out.printf("]\n");
+                        int GID = tileData[tileX][tileY];
 
-                    }
-
-                    //Draw the fucking image please god i hope this works or im gonna cry
-
-                    Graphics gIMG = currentImage.getGraphics();
-                    for(int tileX = 0; tileX < levelWidth; tileX++ ){
-
-                        for(int tileY = 0; tileY < levelHeight; tileY++){
-
-                            int GID = tileData[tileX][tileY];
-
-                            //NO need to draw anything if the current tile is blank
-                            if(GID == 0) continue;
-                            TileSet currentTileset = tilesets.get(0);
-                            for(TileSet testSet : tilesets){
-                                if(GID >= testSet.getFirstGID()-1 && GID <= testSet.getLastGID()){
-                                    currentTileset = testSet;
-                                    break;
-                                }
+                        //NO need to draw anything if the current tile is blank
+                        if (GID == 0) continue;
+                        TileSet currentTileset = tilesets.get(0);
+                        for (TileSet testSet : tilesets) {
+                            if (GID >= testSet.getFirstGID() - 1 && GID <= testSet.getLastGID()) {
+                                currentTileset = testSet;
+                                break;
                             }
-                            GID -= currentTileset.getFirstGID()-1;
-                            int destX = tileX * tileWidth;
-                            int destY = tileY * tileWidth;
-                            //Draw the tile
-
-                            gIMG.drawImage(currentTileset.getTile(GID), destX, destY, null);
-
-
                         }
+                        GID -= currentTileset.getFirstGID() - 1;
+                        int destX = tileX * tileWidth;
+                        int destY = tileY * tileWidth;
+                        //Draw the tile
+
+                        gIMG.drawImage(currentTileset.getTile(GID), destX, destY, null);
+
+
                     }
-
-                    switch (layerName){
-                        case "Background":
-                            backgroundLayer = currentImage;
-                            backgroundTileData = tileData;
-                            break;
-                        case "Collision":
-                            collisionLayer = currentImage;
-                            collisionTileData = tileData;
-                            break;
-                        case "Top":
-                            topLayer = currentImage;
-                            topTileData = tileData;
-                            break;
-                        default:
-                            break;
-                    }
-
-
-                    gIMG.dispose();
                 }
 
-                    File outputfile = new File("saved.png");
-                    ImageIO.write(backgroundLayer, "png", outputfile);
+                switch (layerName) {
+                    case "Background":
+                        backgroundLayer = currentImage;
+                        backgroundTileData = tileData;
+                        break;
+                    case "Collision":
+                        collisionLayer = currentImage;
+                        collisionTileData = tileData;
+                        createCollisionData();
+                        break;
+                    case "Top":
+                        topLayer = currentImage;
+                        topTileData = tileData;
+                        break;
+                    default:
+                        break;
+                }
 
 
-;
-
-
-
-            } catch (Exception e) {
-                e.printStackTrace();
+                gIMG.dispose();
             }
-            }
-    //}
-        private void buildLayer(BufferedImage layerImage, int[][] layerData){
-
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
-        public void drawBackground(Graphics2D g){
-            g.drawImage(backgroundLayer, 0 , 0, null);
-            g.drawImage(collisionLayer, 0, 0, null);
+    }
+
+
+    private void buildLayer(BufferedImage layerImage, int[][] layerData){
+
+    }
+
+    private void createCollisionData(){
+        collisions = new ArrayList<Rectangle>();
+        for(int tileX = 0; tileX < levelWidth; tileX++){
+            for(int tileY = 0; tileY < levelHeight; tileY++){
+                int GID = collisionTileData[tileX][tileY];
+                if(GID > 0){
+
+                    int destX = tileX * tileWidth;
+                    int destY = tileY * tileWidth;
+                    collisions.add(new Rectangle(destX, destY, tileWidth, tileWidth));
+                }
+
+            }
         }
+    }
+
+    public void drawBackground(Graphics2D g){
+        g.drawImage(backgroundLayer, 0 , 0, null);
+        g.drawImage(collisionLayer, 0, 0, null);
+    }
+
+    public List<Rectangle> getCollisions() {
+        return collisions;
+    }
+
 
 }
 

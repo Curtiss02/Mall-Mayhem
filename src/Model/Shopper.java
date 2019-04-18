@@ -6,6 +6,7 @@ import java.util.List;
 
 public class Shopper extends Enemy {
 
+
     boolean hasCollision = true;
     public Shopper(int x, int y){
         super(x, y);
@@ -13,6 +14,8 @@ public class Shopper extends Enemy {
         width = sprite.getWidth();
         height = sprite.getHeight();
         init();
+        this.healthPoints = 10;
+        this.damage = 1;
 
     }
 
@@ -23,12 +26,8 @@ public class Shopper extends Enemy {
 
 
     public void tick(){
+        super.tick();
 
-        x += dx;
-        y += dy;
-
-        this.sprite.setY(y);
-        this.sprite.setX(x);
 
     }
 
