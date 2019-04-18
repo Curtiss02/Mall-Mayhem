@@ -10,6 +10,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.util.Iterator;
 import java.util.Random;
 
 import java.util.ArrayList;
@@ -35,12 +36,15 @@ public class GameController {
     private GUIPanel view;
 
 
+    private Level currentLevel;
+
     //Create arraylists for game objects, is shared with the view
     private List<Sprite> spriteList;
 
     // Keep an list of enemy
     private List<Enemy> enemyList;
 
+    private List<Projectile> projectileList;
 
     public GameController() {}
 
@@ -100,15 +104,17 @@ public class GameController {
     private void init(){
         //Create a new player
 
-        Level testLevel = new Level();
+        Level testLevel = new Level("src/maps/room1.xml");
 
-        testLevel.loadXML("src/maps/room1.xml");
-
+        this.currentLevel = testLevel;
+        view.setCurrentLevel(testLevel);
 
         player = new Player(100, 100);
 
         spriteList = new ArrayList<Sprite>();
         enemyList = new ArrayList<Enemy>();
+        projectileList = new ArrayList<Projectile>();
+
         //Add to list of sprites being drawn
         spriteList.add(player.getSprite());
 
@@ -138,17 +144,70 @@ public class GameController {
 
         moveEnemies();
 
+        projectileList = player.getProjectileList();
+
+        moveProjectiles();
+
+
         checkCollisions();
 
         player.tick();
 
         tickEnemies();
+
+        tickProjectiles();
+
+        updateSprites();
+
+        updateGUI();
+
     }
 
+    private void updateSprites(){
+        spriteList.clear();
+        updateProjectileSprites();
+        updateEnemySprites();
+        spriteList.add(player.getSprite());
+    }
 
+    void tickProjectiles(){
+        for(Projectile thisProjectile : projectileList){
+            thisProjectile.tick();
+        }
+        Iterator<Projectile> projIter = projectileList.iterator();
+        while(projIter.hasNext()){
+            Projectile thisProjectile = projIter.next();
+            int x = thisProjectile.getX();
+            int y = thisProjectile.getY();
+            int width = thisProjectile.getWidth();
+            int height = thisProjectile.getHeight();
+            if(isOffScreen(x, y, width, height)){
+                projIter.remove();
+            }
+        }
+    }
 
+    private void updateProjectileSprites(){
+        for(Projectile thisProjectile : projectileList){
+            spriteList.add(thisProjectile.getSprite());
+        }
+    }
+
+    private void updateEnemySprites(){
+        for(Enemy thisEnemy : enemyList){
+            spriteList.add(thisEnemy.getSprite());
+        }
+    }
+
+    private void moveProjectiles(){
+
+        for(Projectile thisProjectile : projectileList){
+            thisProjectile.move();
+        }
+    }
     private void checkCollisions(){
         Rectangle playerBound = player.getFutureBounds();
+
         //If the playe currently has collision disabled, we dont need to check
         if(!player.isInvulnerable()) {
             for (Enemy thisEnemy : enemyList) {
@@ -158,7 +217,7 @@ public class GameController {
                     //Should probably not stop player in event of enemy collision, just take damage + invuln for small time
                     System.out.println("PLAYER HIT");
                     //Temporary just for now
-
+                    player.takeDamage(thisEnemy.getDamage());
                     //int xDir = (player.getX() - thisEnemy.getX()) / Math.abs(player.getX() - thisEnemy.getX());
                     //int yDir = (player.getY() - thisEnemy.getY()) / Math.abs(player.getY() - thisEnemy.getY());
 
@@ -169,7 +228,7 @@ public class GameController {
                 }
             }
         }
-
+        //Check enemy collision against each other
         for(int i = 0; i < enemyList.size(); i++) {
             if (enemyList.get(i).hasCollision()) {
                 Rectangle firstEnemyBounds = enemyList.get(i).getFutureBounds();
@@ -177,10 +236,20 @@ public class GameController {
                     Rectangle secondEnemyBound = enemyList.get(j).getFutureBounds();
                     if (firstEnemyBounds.intersects(secondEnemyBound)) {
 
-                        enemyList.get(i).stop();
+                        //enemyList.get(i).stop();
                         break;
+
                     }
                 }
+            }
+        }
+
+        List<Rectangle> levelCollisions = currentLevel.getCollisions();
+        //Stop the player from walking through tiles on the collision layer
+        for(int i = 0; i < levelCollisions.size(); i++){
+            Rectangle currentTile = levelCollisions.get(i);
+            if(playerBound.intersects(currentTile)){
+                player.stop();
             }
         }
     }
@@ -208,8 +277,7 @@ public class GameController {
         player.stop();
 
         if (keyPresses[KeyEvent.VK_LEFT]) {
-            player.moveLeft();        tickSprites();
-
+            player.moveLeft();
         }
         if (keyPresses[KeyEvent.VK_RIGHT]) {
             player.moveRight();
@@ -220,66 +288,26 @@ public class GameController {
         if (keyPresses[KeyEvent.VK_DOWN]) {
             player.moveDown();
         }
-
-
-
-    }
-
-
-    private void tickSprites(){
-
-
-        for(int i = 0; i < spriteList.size(); i++){
-
-
-            Random rand = new Random();
-            int max = 6;
-            int min = -5;
-            int rand_y = rand.nextInt(max + 1 -min) + min;
-            int rand_x = rand.nextInt(max + 1 -min) + min;
-
-            spriteList.get(i).setX(spriteList.get(i).getX() + rand_x);
-            spriteList.get(i).setY(spriteList.get(i).getY() + rand_y);
-
-
-            if(spriteList.get(i).getX() > 1440){
-                spriteList.get(i).setVisible(false);
-            }
-            else if(spriteList.get(i).getX() < 0){
-                spriteList.get(i).setVisible(false);
-            }
-            if(spriteList.get(i).getY() > 900){
-                spriteList.get(i).setVisible(false);
-            }
-            else if(spriteList.get(i).getY() < 0){
-                spriteList.get(i).setVisible(false);
-            }
-
-        }
-        int i = 0;
-        while(i < spriteList.size()){
-            if(spriteList.get(i).isVisible() == false){
-                spriteList.remove(i);
-            }
-            else{
-                i++;
-            }
+        if (keyPresses[KeyEvent.VK_SPACE]){
+            player.shoot();
         }
 
 
     }
-    private void createClusterFuck(){
-        for(int i = 0; i < 10000; i++){
-            Random rand = new Random();
 
-            int rand_y = rand.nextInt(1440 + 1);
-            int rand_x = rand.nextInt(900 + 1);
-            Sprite newSprite = new Sprite(rand_x, rand_y);
-            newSprite.setImage("src/img/blackblob.png");
-
-            spriteList.add(newSprite);
-
+    private boolean isOffScreen(int x, int y, int width, int height){
+        int screenWidth = view.getWidth();
+        int screenHeight = view.getHeight();
+        if((x < 0) || (x + width) > screenWidth || (y + height < 0) || (y > screenHeight)){
+            return true;
         }
+        return false;
+
     }
+    private void updateGUI(){
+        view.setPlayerHealth(player.getHealthPoints());
+    }
+
+
 }
 

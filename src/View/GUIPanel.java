@@ -1,5 +1,7 @@
 package View;
 
+import Model.Level;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -24,9 +26,12 @@ public class GUIPanel extends JPanel {
 
     private List<Sprite> spriteList;
 
+    private Level currentLevel;
+
     private String fpsCounter;
 
-    private int frameNum = 0;
+    private int playerHealth;
+
 
 
     public GUIPanel() {
@@ -58,9 +63,12 @@ public class GUIPanel extends JPanel {
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
-        drawFrames(g);
+        if(currentLevel != null) {
+            currentLevel.drawBackground(g2d);
+        }
         drawSprites(g2d);
         drawFPS(g);
+        drawHealth(g);
 
         Toolkit.getDefaultToolkit().sync();
 
@@ -68,12 +76,6 @@ public class GUIPanel extends JPanel {
     }
     public void Update(){
         repaint();
-
-        if (frameNum > 60) {
-            frameNum = 0;
-        } else {
-            frameNum++;
-        }
 
 
     }
@@ -89,6 +91,10 @@ public class GUIPanel extends JPanel {
 
     }
 
+    public void setPlayerHealth(int playerHealth) {
+        this.playerHealth = playerHealth;
+    }
+
     public void setSpriteList(List<Sprite> spriteList){
         this.spriteList = spriteList;
     }
@@ -102,13 +108,20 @@ public class GUIPanel extends JPanel {
         }
     }
 
+    private void drawHealth(Graphics g){
+        g.setColor(Color.RED);
+        g.drawString(String.valueOf(playerHealth), 1400, 40);
+        g.setColor(Color.BLACK);
+    }
+
+    public void setCurrentLevel(Level currentLevel) {
+        this.currentLevel = currentLevel;
+    }
+
     private void drawFPS(Graphics g){
         g.drawString(fpsCounter, 1, 30);
     }
 
-    private void drawFrames(Graphics g) {
-        g.drawString(Integer.toString(frameNum), getWidth() / 2, getHeight() / 2);
-    }
 
     private class TAdapter extends KeyAdapter {
 
@@ -119,6 +132,9 @@ public class GUIPanel extends JPanel {
 
         @Override
         public void keyPressed(KeyEvent e) {
+
+            //Used for finding key codes for more user input
+            //System.out.println(e.getKeyCode());
             keyPresses[e.getKeyCode()] = true;
         }
     }

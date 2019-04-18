@@ -4,15 +4,15 @@ import View.Sprite;
 import java.awt.*;
 
 public abstract class Character {
-    int x, y;
-    int dx, dy;
-    int width, height;
-    int healthPoints;
-    boolean hasCollision = true;
-    boolean isInvulnerable = false;
-    Sprite sprite;
+    protected  int x, y;
+    protected int dx, dy;
+    protected int width, height;
+    protected int healthPoints;
+    protected boolean hasCollision = true;
+    protected boolean isInvulnerable = false;
+    protected Sprite sprite;
     int xDirection;
-    int yDirecion;
+    int yDirection;
 
     public int getX() {
         return x;
@@ -55,6 +55,14 @@ public abstract class Character {
         isInvulnerable = invulnerable;
     }
 
+    public void takeDamage(int damage){
+        healthPoints -= damage;
+    }
+
+    public int getHealthPoints(){
+        return healthPoints;
+    }
+
     public boolean isInvulnerable(){
         return  isInvulnerable;
     }
@@ -63,4 +71,11 @@ public abstract class Character {
         sprite.setImage(s);
     }
 
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
 }
