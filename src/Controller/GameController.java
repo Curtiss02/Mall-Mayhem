@@ -36,6 +36,7 @@ public class GameController {
     private GUIPanel view;
 
 
+
     private Level currentLevel;
 
     //Create arraylists for game objects, is shared with the view
@@ -45,6 +46,8 @@ public class GameController {
     private List<Enemy> enemyList;
 
     private List<Projectile> projectileList;
+
+    private boolean isPaused = false;
 
     public GameController() {}
 
@@ -76,15 +79,20 @@ public class GameController {
             startTime = currentTime;
 
             if (deltaU >= 1) {
-
                 getInput();
-                update();
+                if(!isPaused) {
+                    update();
+
+                }
                 ticks++;
                 deltaU--;
+
             }
 
             if (deltaF >= 1) {
-                view.Update();
+                if(!isPaused) {
+                    view.Update();
+                }
                 frames++;
                 deltaF--;
             }
@@ -104,12 +112,12 @@ public class GameController {
     private void init(){
         //Create a new player
 
-        Level testLevel = new Level("src/maps/room1.xml");
+        Level testLevel = new Level("src/maps/intro.xml");
 
         this.currentLevel = testLevel;
         view.setCurrentLevel(testLevel);
 
-        player = new Player(100, 100);
+        player = new Player(300, 600);
 
         spriteList = new ArrayList<Sprite>();
         enemyList = new ArrayList<Enemy>();
@@ -157,12 +165,25 @@ public class GameController {
 
         tickProjectiles();
 
+        cleanupEnemies();
+
         updateSprites();
 
         updateGUI();
 
     }
+    private void cleanupEnemies(){
+        Iterator<Enemy> enemyIterator = enemyList.iterator();
+        while(enemyIterator.hasNext()){
+            Enemy thisEnemy = enemyIterator.next();
+            //System.out.println(thisEnemy.getHealthPoints());
+            if(thisEnemy.getHealthPoints() <= 0 ){
+                enemyIterator.remove();
+            }
 
+        }
+
+    }
     private void updateSprites(){
         spriteList.clear();
         updateProjectileSprites();
@@ -174,17 +195,7 @@ public class GameController {
         for(Projectile thisProjectile : projectileList){
             thisProjectile.tick();
         }
-        Iterator<Projectile> projIter = projectileList.iterator();
-        while(projIter.hasNext()){
-            Projectile thisProjectile = projIter.next();
-            int x = thisProjectile.getX();
-            int y = thisProjectile.getY();
-            int width = thisProjectile.getWidth();
-            int height = thisProjectile.getHeight();
-            if(isOffScreen(x, y, width, height)){
-                projIter.remove();
-            }
-        }
+
     }
 
     private void updateProjectileSprites(){
@@ -228,8 +239,9 @@ public class GameController {
                 }
             }
         }
+        //CheckEnemyOnEnemyCollisions();
         //Check enemy collision against each other
-        for(int i = 0; i < enemyList.size(); i++) {
+/*        for(int i = 0; i < enemyList.size(); i++) {
             if (enemyList.get(i).hasCollision()) {
                 Rectangle firstEnemyBounds = enemyList.get(i).getFutureBounds();
                 for (int j = i + 1; j < enemyList.size(); j++) {
@@ -242,14 +254,47 @@ public class GameController {
                     }
                 }
             }
-        }
+        }*/
 
+        //CheckPlayerLevelCollsions();
         List<Rectangle> levelCollisions = currentLevel.getCollisions();
         //Stop the player from walking through tiles on the collision layer
         for(int i = 0; i < levelCollisions.size(); i++){
             Rectangle currentTile = levelCollisions.get(i);
             if(playerBound.intersects(currentTile)){
                 player.stop();
+            }
+        }
+
+        //Check the projectile collisions
+        for(Projectile thisProjectile : projectileList){
+
+            int x = thisProjectile.getX();
+            int y = thisProjectile.getY();
+            int width = thisProjectile.getWidth();
+            int height = thisProjectile.getHeight();
+            Rectangle projectileBounds = thisProjectile.getBounds();
+            if(isOffScreen(x, y, width, height)){
+                thisProjectile.takeDamage(99);
+            }
+
+            //Check against enemies if the projectile belongs to the player
+            if(thisProjectile.isPlayer()){
+                for(Enemy thisEnemy : enemyList){
+                    Rectangle enemyBounds = thisEnemy.getFutureBounds();
+                    if(projectileBounds.intersects(enemyBounds)){
+                        System.out.println("ENEMY HIT");
+                        thisEnemy.takeDamage(thisProjectile.getDamage());
+                        thisProjectile.takeDamage(99);
+                    }
+                }
+            }
+            //Checks agains the player if the projectile belongs to the enemy
+            if(thisProjectile.isEnemy()){
+                if(projectileBounds.intersects(player.getFutureBounds())){
+                    player.takeDamage(thisProjectile.getDamage());
+                    thisProjectile.takeDamage(99);
+                }
             }
         }
     }
@@ -269,6 +314,9 @@ public class GameController {
 
     }
 
+
+    private boolean pausePressed;
+    private int pauseReleased = 0;
     private void getInput(){
 
         //Contains information on current status of keyboard input
@@ -276,21 +324,44 @@ public class GameController {
 
         player.stop();
 
-        if (keyPresses[KeyEvent.VK_LEFT]) {
-            player.moveLeft();
+        if(keyPresses[KeyEvent.VK_P]){
+            if(pauseReleased == 0){
+                isPaused = true;
+            }
+            if(pauseReleased > 0){
+                isPaused = false;
+            }
+
+
         }
-        if (keyPresses[KeyEvent.VK_RIGHT]) {
-            player.moveRight();
+        else{
+            if(isPaused){
+                pauseReleased++;
+            }
+            else{
+                pauseReleased = 0;
+            }
+
         }
-        if (keyPresses[KeyEvent.VK_UP]) {
-            player.moveUp();
+        if(!isPaused) {
+            if (keyPresses[KeyEvent.VK_A]) {
+                player.moveLeft();
+            } else if (keyPresses[KeyEvent.VK_D]) {
+                player.moveRight();
+            }
+            if (keyPresses[KeyEvent.VK_W]) {
+                player.moveUp();
+            } else if (keyPresses[KeyEvent.VK_S]) {
+                player.moveDown();
+            }
+            if (keyPresses[KeyEvent.VK_SHIFT]) {
+                player.sprint();
+            }
+            if (keyPresses[KeyEvent.VK_SPACE]) {
+                player.shoot();
+            }
         }
-        if (keyPresses[KeyEvent.VK_DOWN]) {
-            player.moveDown();
-        }
-        if (keyPresses[KeyEvent.VK_SPACE]){
-            player.shoot();
-        }
+
 
 
     }

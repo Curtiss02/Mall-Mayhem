@@ -5,17 +5,25 @@ import View.Sprite;
 public class Ball extends Projectile {
 
     private final int speed = 6;
-    private final int damage = 1;
+
+
 
     public Ball(int x, int y, int xDir, int yDir){
         this.x = x;
         this.y = y;
+        this.healthPoints = 1;
         xDirection = xDir;
         yDirection = yDir;
         sprite = new Sprite(x, y);
-        width = sprite.getWidth();
-        height = sprite.getHeight();
+
+        this.isEnemy = false;
+        this.isPlayer = true;
+        this.damage = 2;
+
         sprite.setImage("src/img/ball.png");
+
+        this.width = sprite.getWidth();
+        this.height = sprite.getHeight();
 
     }
 

@@ -8,9 +8,9 @@ public class GameFrame extends JFrame {
     public GUIPanel myGUIPanel;
     public GameFrame(){
         super("Mall Mayhem");
-        EventQueue.invokeLater(() -> {
+        //EventQueue.invokeLater(() -> {
             myGUIPanel = new GUIPanel();
-        });
+        //});
         start();
 
     }

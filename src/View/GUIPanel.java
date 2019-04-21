@@ -65,8 +65,14 @@ public class GUIPanel extends JPanel {
         Graphics2D g2d = (Graphics2D) g;
         if(currentLevel != null) {
             currentLevel.drawBackground(g2d);
+
         }
         drawSprites(g2d);
+        if(currentLevel != null) {
+            currentLevel.drawTop(g2d);
+
+        }
+
         drawFPS(g);
         drawHealth(g);
 
@@ -127,6 +133,7 @@ public class GUIPanel extends JPanel {
 
         @Override
         public void keyReleased(KeyEvent e) {
+
             keyPresses[e.getKeyCode()] = false;
         }
 

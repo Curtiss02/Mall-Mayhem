@@ -56,8 +56,13 @@ public abstract class Character {
     }
 
     public void takeDamage(int damage){
-        healthPoints -= damage;
+        if(!isInvulnerable) {
+            healthPoints -= damage;
+            isInvulnerable = true;
+        }
+
     }
+
 
     public int getHealthPoints(){
         return healthPoints;

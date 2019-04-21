@@ -14,9 +14,9 @@ import org.w3c.dom.css.Rect;
 
 public class Level {
 
-    private BufferedImage backgroundLayer;
-    private BufferedImage collisionLayer;
-    private BufferedImage topLayer;
+    private List<BufferedImage> backgroundLayers;
+    private List<BufferedImage> collisionLayers;
+    private List<BufferedImage> topLayers;
     private List<TileSet> tilesets;
     private List<Rectangle> collisions;
 
@@ -30,6 +30,11 @@ public class Level {
 
 
     public Level(String xmlFile) {
+        backgroundLayers = new ArrayList<BufferedImage>();
+        collisionLayers = new ArrayList<BufferedImage>();
+        topLayers = new ArrayList<BufferedImage>();
+        collisions = new ArrayList<Rectangle>();
+
         loadXML(xmlFile);
     }
 
@@ -60,6 +65,8 @@ public class Level {
             levelWidth = Integer.valueOf(map.getAttribute("width"));
             levelHeight = Integer.valueOf(map.getAttribute("height"));
 
+
+
             NodeList tilesetNodes = doc.getElementsByTagName("tileset");
             tilesets = new ArrayList<TileSet>();
 
@@ -79,6 +86,7 @@ public class Level {
 
 
                 int firstGID = Integer.valueOf(tilesetNode.getAttribute("firstgid"));
+
                 String tilesetName = tilesetNode.getAttribute("name");
 
                 int tileWidth = Integer.valueOf(tilesetNode.getAttribute("tilewidth"));
@@ -143,9 +151,9 @@ public class Level {
                         if (GID == 0) continue;
                         TileSet currentTileset = tilesets.get(0);
                         for (TileSet testSet : tilesets) {
-                            if (GID >= testSet.getFirstGID() - 1 && GID <= testSet.getLastGID()) {
+                            if (GID >= testSet.getFirstGID() - 1 ) {
                                 currentTileset = testSet;
-                                break;
+
                             }
                         }
                         GID -= currentTileset.getFirstGID() - 1;
@@ -161,16 +169,16 @@ public class Level {
 
                 switch (layerName) {
                     case "Background":
-                        backgroundLayer = currentImage;
+                        backgroundLayers.add(currentImage);
                         backgroundTileData = tileData;
                         break;
                     case "Collision":
-                        collisionLayer = currentImage;
+                        collisionLayers.add(currentImage);
                         collisionTileData = tileData;
                         createCollisionData();
                         break;
                     case "Top":
-                        topLayer = currentImage;
+                        topLayers.add(currentImage);
                         topTileData = tileData;
                         break;
                     default:
@@ -192,7 +200,7 @@ public class Level {
     }
 
     private void createCollisionData(){
-        collisions = new ArrayList<Rectangle>();
+
         for(int tileX = 0; tileX < levelWidth; tileX++){
             for(int tileY = 0; tileY < levelHeight; tileY++){
                 int GID = collisionTileData[tileX][tileY];
@@ -208,8 +216,19 @@ public class Level {
     }
 
     public void drawBackground(Graphics2D g){
-        g.drawImage(backgroundLayer, 0 , 0, null);
-        g.drawImage(collisionLayer, 0, 0, null);
+        for(BufferedImage backgroundLayer : backgroundLayers){
+            g.drawImage(backgroundLayer, 0 , 0, null);
+        }
+        for(BufferedImage collisionLayer : collisionLayers){
+            g.drawImage(collisionLayer, 0, 0, null);
+        }
+
+    }
+    public void drawTop(Graphics2D g){
+        for(BufferedImage topLayer : topLayers){
+            g.drawImage(topLayer, 0, 0, null);
+        }
+
     }
 
     public List<Rectangle> getCollisions() {

@@ -35,6 +35,7 @@ public class TileSet {
         this.tileHeight = tileHeight;
         this.imageSrc = imageSrc;
         this.widthInTiles = width/tileWidth;
+        this.imageSrc = imageSrc;
         this.lastGID = widthInTiles * (imageHeight / tileHeight) + lastGID - 1;
         loadImage();
 
@@ -60,7 +61,8 @@ public class TileSet {
         xPos *= tileWidth;
         yPos *= tileWidth;
 
-        System.out.printf("Tile Width:%d X:%d Y:%d GID:%d ",tileWidth, xPos, yPos, GID);
+        System.out.printf("Tile Width:%d X:%d Y:%d GID:%d Accessig file: %s\n",tileWidth, xPos, yPos, GID, imageSrc);
+
 
         BufferedImage tile = tilesetImage.getSubimage(xPos, yPos, tileWidth, tileHeight);
 

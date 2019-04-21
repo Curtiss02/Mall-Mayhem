@@ -2,9 +2,18 @@ package Model;
 
 public abstract class Projectile extends Character {
 
-        private int damage;
-        private boolean isPlayer;
-        private boolean isEnemy;
+        protected int damage;
+        protected boolean isPlayer;
+        protected boolean isEnemy;
+
+
+        public boolean isPlayer() {
+                return isPlayer;
+        }
+
+        public boolean isEnemy() {
+                return isEnemy;
+        }
 
         public int getDamage(){
             return damage;

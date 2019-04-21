@@ -17,6 +17,8 @@ public class Shopper extends Enemy {
         this.healthPoints = 10;
         this.damage = 1;
 
+        this.speed = 2;
+
     }
 
 
@@ -42,7 +44,7 @@ public class Shopper extends Enemy {
 
     private List<Point> patrolPoints;
     private int pointIndex;
-    private final int speed = 2;
+
 
     private void initPatrol(){
         patrolPoints = new ArrayList<Point>();
@@ -67,7 +69,14 @@ public class Shopper extends Enemy {
             }
             else {
                 int direction = dist/Math.abs(dist);
-                dx = speed * direction;
+                switch (direction){
+                    case 1:
+                        moveRight();
+                        break;
+                    case -1:
+                        moveLeft();
+                        break;
+                }
             }
         }
         else{
@@ -81,7 +90,14 @@ public class Shopper extends Enemy {
             }
             else {
                 int direction = dist/Math.abs(dist);
-                dy = speed * direction;
+                switch (direction){
+                    case 1:
+                        moveDown();
+                        break;
+                    case -1:
+                        moveUp();
+                        break;
+                }
             }
         }
         else{
