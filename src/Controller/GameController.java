@@ -112,22 +112,10 @@ public class GameController {
     private void init(){
         //Create a new player
 
-        Level testLevel = new Level("src/maps/intro.xml");
-
-        this.currentLevel = testLevel;
-        view.setCurrentLevel(testLevel);
-
-        player = new Player(300, 600);
-
-        spriteList = new ArrayList<Sprite>();
-        enemyList = new ArrayList<Enemy>();
-        projectileList = new ArrayList<Projectile>();
-
-        //Add to list of sprites being drawn
-        spriteList.add(player.getSprite());
 
 
-        Shopper testShopper = new Shopper(250, 250);
+
+/*        Shopper testShopper = new Shopper(250, 250);
         testShopper.addPatrolPoint(new Point(500, 500));
         testShopper.addPatrolPoint(new Point(300, 100));
         testShopper.addPatrolPoint(new Point(900, 700));
@@ -137,14 +125,16 @@ public class GameController {
         shopper2.addPatrolPoint(new Point(100,100));
         shopper2.addPatrolPoint(new Point(200,0));
         shopper2.addPatrolPoint(new Point(394,983));
-        shopper2.addPatrolPoint(new Point(900,700));
+        shopper2.addPatrolPoint(new Point(900,700));*/
 
-        enemyList.add(testShopper);
-        enemyList.add(shopper2);
 
-        spriteList.add(testShopper.getSprite());
-        spriteList.add(shopper2.getSprite());
-        view.setSpriteList(spriteList);
+        //
+        //  spriteList.add(test1.getSprite());
+
+//        enemyList.add(testShopper);
+ //       enemyList.add(shopper2);
+        IntroLevel();
+
     }
 
     // Will evetually include function which will tick() trough every currentl used entity
@@ -226,7 +216,6 @@ public class GameController {
                 if (playerBound.intersects(enemyBound)) {
 
                     //Should probably not stop player in event of enemy collision, just take damage + invuln for small time
-                    System.out.println("PLAYER HIT");
                     //Temporary just for now
                     player.takeDamage(thisEnemy.getDamage());
                     //int xDir = (player.getX() - thisEnemy.getX()) / Math.abs(player.getX() - thisEnemy.getX());
@@ -266,6 +255,26 @@ public class GameController {
             }
         }
 
+        //Check enemy level collisions
+        for(Enemy thisEnemy : enemyList){
+            Rectangle enemyBounds = thisEnemy.getFutureBounds();
+            for(Rectangle currentTile : levelCollisions){
+                if(enemyBounds.intersects(currentTile)){
+                    thisEnemy.stop();
+
+                    thisEnemy.setStuck(true);
+
+                    break;
+
+                }
+                else{
+
+                    thisEnemy.setStuck(false);
+
+                }
+            }
+        }
+
         //Check the projectile collisions
         for(Projectile thisProjectile : projectileList){
 
@@ -283,16 +292,20 @@ public class GameController {
                 for(Enemy thisEnemy : enemyList){
                     Rectangle enemyBounds = thisEnemy.getFutureBounds();
                     if(projectileBounds.intersects(enemyBounds)){
-                        System.out.println("ENEMY HIT");
-                        thisEnemy.takeDamage(thisProjectile.getDamage());
+                        if(player.isInvulnerable() == false){
+                            thisEnemy.takeDamage(thisProjectile.getDamage());
+                        }
                         thisProjectile.takeDamage(99);
                     }
                 }
             }
             //Checks agains the player if the projectile belongs to the enemy
             if(thisProjectile.isEnemy()){
+
                 if(projectileBounds.intersects(player.getFutureBounds())){
-                    player.takeDamage(thisProjectile.getDamage());
+                    if(player.isInvulnerable() == false){
+                        player.takeDamage(thisProjectile.getDamage());
+                    }
                     thisProjectile.takeDamage(99);
                 }
             }
@@ -301,6 +314,7 @@ public class GameController {
 
     private void moveEnemies(){
         for(Enemy thisEnemy : enemyList){
+            thisEnemy.stop();
             thisEnemy.move();
         }
     }
@@ -379,6 +393,48 @@ public class GameController {
         view.setPlayerHealth(player.getHealthPoints());
     }
 
+
+    private void IntroLevel(){
+        Level testLevel = new Level("src/maps/intro.xml");
+
+        this.currentLevel = testLevel;
+        view.setCurrentLevel(testLevel);
+
+        player = new Player(300, 600);
+
+        spriteList = new ArrayList<Sprite>();
+        enemyList = new ArrayList<Enemy>();
+        projectileList = new ArrayList<Projectile>();
+
+        //Add to list of sprites being drawn
+        spriteList.add(player.getSprite());
+
+        final int zone1XMax = 576;
+        final int zone1XMin = 40;
+        final int zone2XMax = 1400;
+        final int zone2XMin = 900;
+        final int yMax = 864;
+        final int yMin = 256;
+        final int npcCount = 30;
+        for(int i = 0; i < npcCount; i++){
+            Random random = new Random();
+            int x;
+            int y = random.nextInt(yMax - yMin) + yMin;
+            if(random.nextBoolean()){
+                x = random.nextInt(zone1XMax - zone1XMin) + zone1XMin;
+            }
+            else{
+                x = random.nextInt(zone2XMax - zone2XMin) + zone2XMin;
+            }
+            Enemy currentNPC  = new NPC_Shopper(x, y);
+            enemyList.add(currentNPC);
+        }
+        view.setSpriteList(spriteList);
+
+
+
+
+    }
 
 }
 

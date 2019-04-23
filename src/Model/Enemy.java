@@ -12,6 +12,8 @@ public abstract class Enemy extends Character{
     private int invulnTimer = 0;
     protected int invulnTicks = 10;
     protected int speed;
+    protected boolean isStuck = false;
+    protected int stuckCounter = 0;
 
     protected enum Direction{
         UP,
@@ -84,6 +86,15 @@ public abstract class Enemy extends Character{
             setInvulnerable(false);
             invulnTimer = 0;
         }
+        //System.out.println(stuckCounter);
+        //System.out.println(isStuck);
+
+        if(isStuck){
+            stuckCounter++;
+        }
+        else{
+            stuckCounter = 0;
+        }
 
         x += dx;
         y += dy;
@@ -92,6 +103,7 @@ public abstract class Enemy extends Character{
         this.sprite.setX(x);
     }
 
-
-
+    public void setStuck(boolean stuck) {
+        isStuck = stuck;
+    }
 }

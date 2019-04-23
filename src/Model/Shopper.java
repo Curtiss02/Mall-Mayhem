@@ -59,6 +59,9 @@ public class Shopper extends Enemy {
         if(this.x == currentDest.x && this.y == currentDest.y){
             nextPatrolPoint();
         }
+        if(stuckCounter > 30){
+            nextPatrolPoint();
+        }
 
         int dist;
         if(this.x != currentDest.x){
