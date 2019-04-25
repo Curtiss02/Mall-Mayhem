@@ -37,7 +37,7 @@ public class NPC_Shopper extends Enemy {
 
     public void tick(){
         super.tick();
-        isInvulnerable = true;
+        isInvulnerable = false;
         if(isWaiting == true){
             waitTimer++;
 
@@ -63,18 +63,18 @@ public class NPC_Shopper extends Enemy {
         //Check if we have reached the current destination
         if((this.x == currentDestination.x) && (this.y == currentDestination.y)){
             getNewMeanderPoint();
-            System.out.println("REACDHED DEST");
+            //System.out.println("REACDHED DEST");
             isWaiting = true;
             Random random = new Random();
             waitValue = random.nextInt(maxWait - minWait) + minWait;
 
-            System.out.println("Wait value: " + waitValue);
+            //System.out.println("Wait value: " + waitValue);
 
         }
 
 
         //System.out.printf("X:%d Y:%d gX:%d Gy:%d\n", x, y, currentDestination.x, currentDestination.y);
-        int dist;
+        double dist;
         if(!isWaiting) {
             if (this.x != currentDestination.x) {
                 dist = currentDestination.x - this.x;
@@ -82,7 +82,7 @@ public class NPC_Shopper extends Enemy {
                 if (Math.abs(dist) < speed) {
                     dx = dist;
                 } else {
-                    int direction = dist / Math.abs(dist);
+                    int direction = (int) (dist / Math.abs(dist));
                     switch (direction) {
                         case 1:
                             moveRight();
@@ -101,7 +101,7 @@ public class NPC_Shopper extends Enemy {
                 if (Math.abs(dist) < speed) {
                     dy = dist;
                 } else {
-                    int direction = dist / Math.abs(dist);
+                    int direction = (int)(dist / Math.abs(dist));
                     switch (direction) {
                         case 1:
                             moveDown();
@@ -127,10 +127,10 @@ public class NPC_Shopper extends Enemy {
 
         //Choose x or y movement
         if(random.nextBoolean()){
-            currentDestination = new Point(this.x,this.y + newDist);
+            currentDestination = new Point((int)this.x,(int)this.y + newDist);
         }
         else{
-            currentDestination = new Point(this.x + newDist, this.y);
+            currentDestination = new Point((int)this.x + newDist, (int)this.y);
         }
 
     }

@@ -1,14 +1,11 @@
 package View;
 
-import Model.Level;
+import Model.Map;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.security.Key;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -26,7 +23,7 @@ public class GUIPanel extends JPanel {
 
     private List<Sprite> spriteList;
 
-    private Level currentLevel;
+    private Map currentMap;
 
     private String fpsCounter;
 
@@ -63,13 +60,13 @@ public class GUIPanel extends JPanel {
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
-        if(currentLevel != null) {
-            currentLevel.drawBackground(g2d);
+        if(currentMap != null) {
+            currentMap.drawBackground(g2d);
 
         }
         drawSprites(g2d);
-        if(currentLevel != null) {
-            currentLevel.drawTop(g2d);
+        if(currentMap != null) {
+            currentMap.drawTop(g2d);
 
         }
 
@@ -120,8 +117,8 @@ public class GUIPanel extends JPanel {
         g.setColor(Color.BLACK);
     }
 
-    public void setCurrentLevel(Level currentLevel) {
-        this.currentLevel = currentLevel;
+    public void setCurrentMap(Map currentMap) {
+        this.currentMap = currentMap;
     }
 
     private void drawFPS(Graphics g){

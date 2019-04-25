@@ -7,15 +7,12 @@ import Model.*;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.util.Iterator;
 import java.util.Random;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.RecursiveAction;
 
 
 public class GameController {
@@ -25,7 +22,7 @@ public class GameController {
     //Sets refresh rate, 16ms ~= 60fps
     private final int TICK_DELAY = 16;
     private final int FPS = 60;
-    private final int UPS = 120;
+    private int UPS = 120;
 
     //Defines whether the game is running or not, used for the main game loop
     private boolean running;
@@ -37,7 +34,7 @@ public class GameController {
 
 
 
-    private Level currentLevel;
+    private Map currentMap;
 
     //Create arraylists for game objects, is shared with the view
     private List<Sprite> spriteList;
@@ -46,6 +43,12 @@ public class GameController {
     private List<Enemy> enemyList;
 
     private List<Projectile> projectileList;
+
+    private List<Pickup> pickupList;
+
+    private List<Level> levelList;
+    private int levelIndex;
+    private Level currentLevel;
 
     private boolean isPaused = false;
 
@@ -115,27 +118,28 @@ public class GameController {
 
 
 
-/*        Shopper testShopper = new Shopper(250, 250);
-        testShopper.addPatrolPoint(new Point(500, 500));
-        testShopper.addPatrolPoint(new Point(300, 100));
-        testShopper.addPatrolPoint(new Point(900, 700));
 
-        Shopper shopper2 = new Shopper(900, 900);
-        shopper2.addPatrolPoint(new Point(50,100));
-        shopper2.addPatrolPoint(new Point(100,100));
-        shopper2.addPatrolPoint(new Point(200,0));
-        shopper2.addPatrolPoint(new Point(394,983));
-        shopper2.addPatrolPoint(new Point(900,700));*/
+        spriteList = new ArrayList<Sprite>();
+        levelList = new ArrayList<>();
 
 
-        //
-        //  spriteList.add(test1.getSprite());
+        levelList.add(new StartLevel());
+        levelIndex = 0;
+        currentLevel = levelList.get(levelIndex);
+        enemyList = currentLevel.getEnemyList();
+        player = new Player(currentLevel.getPlayerStart().x,currentLevel.getPlayerStart().y);
+        projectileList = player.getProjectileList();
+        pickupList = currentLevel.getPickupList();
+        currentMap = currentLevel.getMap();
 
-//        enemyList.add(testShopper);
- //       enemyList.add(shopper2);
-        IntroLevel();
+
+
+        view.setSpriteList(spriteList);
+        view.setCurrentMap(currentMap);
 
     }
+
+
 
     // Will evetually include function which will tick() trough every currentl used entity
     private void update(){
@@ -145,7 +149,6 @@ public class GameController {
         projectileList = player.getProjectileList();
 
         moveProjectiles();
-
 
         checkCollisions();
 
@@ -162,6 +165,7 @@ public class GameController {
         updateGUI();
 
     }
+
     private void cleanupEnemies(){
         Iterator<Enemy> enemyIterator = enemyList.iterator();
         while(enemyIterator.hasNext()){
@@ -178,6 +182,7 @@ public class GameController {
         spriteList.clear();
         updateProjectileSprites();
         updateEnemySprites();
+        updatePickupSprites();
         spriteList.add(player.getSprite());
     }
 
@@ -190,6 +195,7 @@ public class GameController {
 
     private void updateProjectileSprites(){
         for(Projectile thisProjectile : projectileList){
+
             spriteList.add(thisProjectile.getSprite());
         }
     }
@@ -200,6 +206,12 @@ public class GameController {
         }
     }
 
+    private void updatePickupSprites(){
+        for(Pickup thisPickup : pickupList){
+            spriteList.add(thisPickup.getSprite());
+        }
+    }
+
     private void moveProjectiles(){
 
         for(Projectile thisProjectile : projectileList){
@@ -207,7 +219,22 @@ public class GameController {
         }
     }
     private void checkCollisions(){
+
         Rectangle playerBound = player.getFutureBounds();
+
+
+
+        //Check player and level transition tile collisions
+        for(Rectangle thisTile : currentMap.getNextLevelCollision()){
+            if(playerBound.intersects(thisTile)){
+                nextLevel();
+            }
+        }
+
+
+
+
+
 
         //If the playe currently has collision disabled, we dont need to check
         if(!player.isInvulnerable()) {
@@ -246,7 +273,7 @@ public class GameController {
         }*/
 
         //CheckPlayerLevelCollsions();
-        List<Rectangle> levelCollisions = currentLevel.getCollisions();
+        List<Rectangle> levelCollisions = currentMap.getCollisions();
         //Stop the player from walking through tiles on the collision layer
         for(int i = 0; i < levelCollisions.size(); i++){
             Rectangle currentTile = levelCollisions.get(i);
@@ -278,12 +305,13 @@ public class GameController {
         //Check the projectile collisions
         for(Projectile thisProjectile : projectileList){
 
-            int x = thisProjectile.getX();
-            int y = thisProjectile.getY();
+            double x = thisProjectile.getX();
+            double y = thisProjectile.getY();
             int width = thisProjectile.getWidth();
             int height = thisProjectile.getHeight();
             Rectangle projectileBounds = thisProjectile.getBounds();
-            if(isOffScreen(x, y, width, height)){
+            if(isOffScreen((int)x, (int)y, width, height)){
+                System.out.println("OFF");
                 thisProjectile.takeDamage(99);
             }
 
@@ -292,7 +320,7 @@ public class GameController {
                 for(Enemy thisEnemy : enemyList){
                     Rectangle enemyBounds = thisEnemy.getFutureBounds();
                     if(projectileBounds.intersects(enemyBounds)){
-                        if(player.isInvulnerable() == false){
+                        if(thisEnemy.isInvulnerable() == false){
                             thisEnemy.takeDamage(thisProjectile.getDamage());
                         }
                         thisProjectile.takeDamage(99);
@@ -302,7 +330,7 @@ public class GameController {
             //Checks agains the player if the projectile belongs to the enemy
             if(thisProjectile.isEnemy()){
 
-                if(projectileBounds.intersects(player.getFutureBounds())){
+                if(projectileBounds.intersects(playerBound)){
                     if(player.isInvulnerable() == false){
                         player.takeDamage(thisProjectile.getDamage());
                     }
@@ -394,47 +422,32 @@ public class GameController {
     }
 
 
-    private void IntroLevel(){
-        Level testLevel = new Level("src/maps/intro.xml");
-
-        this.currentLevel = testLevel;
-        view.setCurrentLevel(testLevel);
-
-        player = new Player(300, 600);
-
-        spriteList = new ArrayList<Sprite>();
-        enemyList = new ArrayList<Enemy>();
-        projectileList = new ArrayList<Projectile>();
-
-        //Add to list of sprites being drawn
-        spriteList.add(player.getSprite());
-
-        final int zone1XMax = 576;
-        final int zone1XMin = 40;
-        final int zone2XMax = 1400;
-        final int zone2XMin = 900;
-        final int yMax = 864;
-        final int yMin = 256;
-        final int npcCount = 30;
-        for(int i = 0; i < npcCount; i++){
-            Random random = new Random();
-            int x;
-            int y = random.nextInt(yMax - yMin) + yMin;
-            if(random.nextBoolean()){
-                x = random.nextInt(zone1XMax - zone1XMin) + zone1XMin;
-            }
-            else{
-                x = random.nextInt(zone2XMax - zone2XMin) + zone2XMin;
-            }
-            Enemy currentNPC  = new NPC_Shopper(x, y);
-            enemyList.add(currentNPC);
-        }
-        view.setSpriteList(spriteList);
-
-
-
+    private void IntroLevel() {
 
     }
+
+    private void level2(){
+        spriteList.clear();
+        enemyList.clear();
+        projectileList.clear();
+        player.setX(1);
+        player.setY(1);
+
+    }
+
+    private void nextLevel(){
+        levelIndex++;
+        currentLevel = levelList.get(levelIndex);
+        currentMap = currentLevel.getMap();
+        enemyList = currentLevel.getEnemyList();
+        pickupList = currentLevel.getPickupList();
+        view.setCurrentMap(currentMap);
+    }
+
+
+
+
+
 
 }
 

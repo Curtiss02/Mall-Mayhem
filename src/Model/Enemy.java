@@ -99,8 +99,8 @@ public abstract class Enemy extends Character{
         x += dx;
         y += dy;
 
-        this.sprite.setY(y);
-        this.sprite.setX(x);
+        this.sprite.setY((int)y);
+        this.sprite.setX((int)x);
     }
 
     public void setStuck(boolean stuck) {

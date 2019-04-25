@@ -20,6 +20,12 @@ public class Sprite {
         isVisible = true;
     }
 
+    public Sprite(double x, double y){
+        this.x = (int)x;
+        this.y = (int)y;
+        isVisible = true;
+    }
+
 
     public int getX() {
         return x;
@@ -27,6 +33,14 @@ public class Sprite {
 
     public void setX(int x) {
         this.x = x;
+    }
+
+    public void setX(double x){
+        this.x = (int)x;
+    }
+
+    public void setY(double y){
+        this.y = (int)y;
     }
 
     public int getY() {

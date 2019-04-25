@@ -4,17 +4,18 @@ import View.Sprite;
 import java.awt.*;
 
 public abstract class Character {
-    protected  int x, y;
-    protected int dx, dy;
+    protected double y;
+    protected double x;
+    protected double dx, dy;
     protected int width, height;
     protected int healthPoints;
     protected boolean hasCollision = true;
     protected boolean isInvulnerable = false;
     protected Sprite sprite;
-    int xDirection;
-    int yDirection;
+    double xDirection;
+    double yDirection;
 
-    public int getX() {
+    public double getX() {
         return x;
     }
 
@@ -22,7 +23,7 @@ public abstract class Character {
         this.x = x;
     }
 
-    public int getY() {
+    public double getY() {
         return y;
     }
 
@@ -35,10 +36,11 @@ public abstract class Character {
     }
 
     public Rectangle getBounds() {
-        return new Rectangle(x, y, width, height);
+        return new Rectangle((int)x, (int)y, width, height);
     }
+
     public Rectangle getFutureBounds(){
-        return new Rectangle(x+dx, y+dy, width, height);
+        return new Rectangle((int)(x+dx), (int)(y+dy), width, height);
     }
 
     public boolean hasCollision(){

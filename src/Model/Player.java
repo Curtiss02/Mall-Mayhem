@@ -11,7 +11,7 @@ import java.util.List;
 
 public class Player extends Character {
 
-    private final int speed = 2;
+    private final int speed = 1;
     private final int invulnTicks = 120;
     private final int shootCooldown = 20;
 
@@ -26,6 +26,7 @@ public class Player extends Character {
     private String stillDown = "src/img/player/stand-down.png";
     private String stillLeft = "src/img/player/stand-left.png";
     private String stillRight = "src/img/player/stand-right.png";
+    private boolean superShot = true;
 
 
     private enum Direction{
@@ -51,6 +52,10 @@ public class Player extends Character {
         this.width = sprite.getWidth();
         this.height = sprite.getHeight();
         this.projectileList = new ArrayList<Projectile>();
+
+        projectileHeight = new Ball(0,0,0,0).getHeight();
+        projectileWidth =  new Ball(0,0,0,0).getWidth();
+
         this.invulnTimer = 0;
         this.yDirection = 0;
         this.xDirection = 1;
@@ -70,11 +75,11 @@ public class Player extends Character {
 
     }
 
-    public int getDx() {
+    public double getDx() {
         return dx;
     }
 
-    public int getDy() {
+    public double getDy() {
         return dy;
     }
 
@@ -167,7 +172,17 @@ public class Player extends Character {
     public void shoot(){
         if(shootTimer == 0) {
 
-            projectileList.add(new Ball(x, y, xDirection, yDirection));
+            if(superShot) {
+                for (Direction direction : Direction.values()) {
+                    setXandYDirection(direction);
+                    projectileList.add(new Ball(x+projectileXOffset, y+projectileYOffset, xDirection, yDirection));
+                }
+            }
+            else {
+
+                projectileList.add(new Ball(x+projectileXOffset, y+projectileYOffset, xDirection, yDirection));
+            }
+
             shootTimer++;
         }
 
@@ -203,46 +218,68 @@ public class Player extends Character {
             }
         }
 
-        setXandYDirection();
+        setXandYDirection(direction);
 
 
 
 
     }
 
-    public void setXandYDirection(){
+    private int projectileXOffset;
+    private int projectileYOffset;
+    private int projectileWidth;
+    private int projectileHeight;
+
+    public void setXandYDirection(Direction direction){
+
         switch (direction) {
             case UP:
                 xDirection = 0;
                 yDirection = -1;
+                projectileXOffset = (width/2) - projectileWidth/2;
+                projectileYOffset = 0;
                 break;
             case DOWN:
                 xDirection = 0;
                 yDirection = 1;
+                projectileXOffset = (width/2) - projectileWidth/2;
+                projectileYOffset = (height);
                 break;
             case LEFT:
                 xDirection = -1;
                 yDirection = 0;
+                projectileXOffset = 0;
+                projectileYOffset = height/2 - projectileHeight/2;
                 break;
             case RIGHT:
                 xDirection = 1;
                 yDirection = 0;
+                projectileXOffset = width - projectileWidth/2;
+                projectileYOffset = height/2 - projectileHeight/2;
                 break;
             case UP_LEFT:
-                xDirection = -1;
-                yDirection = -1;
+                xDirection = -0.707;
+                yDirection = -0.707;
+                projectileXOffset = 0;
+                projectileYOffset = 0;
                 break;
             case UP_RIGHT:
-                xDirection = 1;
-                yDirection = -1;
+                xDirection = 0.707;
+                yDirection = -0.707;
+                projectileXOffset = width;
+                projectileYOffset = 0;
                 break;
             case DOWN_LEFT:
-                xDirection = -1;
-                yDirection = 1;
+                xDirection = -0.707;
+                yDirection = 0.707;
+                projectileXOffset = 0;
+                projectileYOffset = height;
                 break;
             case DOWN_RIGHT:
-                xDirection = 1;
-                yDirection = 1;
+                xDirection = 0.707;
+                yDirection = 0.707;
+                projectileXOffset = width;
+                projectileYOffset = height;
                 break;
         }
     }

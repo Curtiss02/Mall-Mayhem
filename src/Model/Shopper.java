@@ -63,7 +63,7 @@ public class Shopper extends Enemy {
             nextPatrolPoint();
         }
 
-        int dist;
+        double dist;
         if(this.x != currentDest.x){
             dist = currentDest.x - this.x;
             //Counteracts the effect of speed being greater than the distance, cauing jitter
@@ -71,7 +71,7 @@ public class Shopper extends Enemy {
                 dx = dist;
             }
             else {
-                int direction = dist/Math.abs(dist);
+                int direction = (int)(dist/Math.abs(dist));
                 switch (direction){
                     case 1:
                         moveRight();
@@ -92,7 +92,7 @@ public class Shopper extends Enemy {
                 dy = dist;
             }
             else {
-                int direction = dist/Math.abs(dist);
+                int direction = (int)(dist/Math.abs(dist));
                 switch (direction){
                     case 1:
                         moveDown();
