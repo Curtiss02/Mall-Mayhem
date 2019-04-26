@@ -13,5 +13,8 @@ public class Level2 extends Level {
 
         Pickup healthKit = new Pickup( 300, 300, Pickup.TYPE.HEALTH);
         pickupList.add(healthKit);
+
+        enemyList.add(new Boss(300,300));
+        enemyList.add(new NPC_Shopper(100,100));
     }
 }

@@ -131,7 +131,6 @@ public class GameController {
         currentLevel = levelList.get(levelIndex);
         enemyList = currentLevel.getEnemyList();
         player = new Player(currentLevel.getPlayerStart().x,currentLevel.getPlayerStart().y);
-        projectileList = Character.getProjectileList();
         pickupList = currentLevel.getPickupList();
         currentMap = currentLevel.getMap();
 
@@ -146,6 +145,7 @@ public class GameController {
 
     // Will evetually include function which will tick() trough every currentl used entity
     private void update(){
+        projectileList = Character.getProjectileList();
 
         moveEnemies();
 
@@ -463,6 +463,7 @@ public class GameController {
         pickupList = currentLevel.getPickupList();
         player.setX(currentLevel.getPlayerStart().x);
         player.setY(currentLevel.getPlayerStart().y);
+        projectileList.clear();
         view.setCurrentMap(currentMap);
     }
 

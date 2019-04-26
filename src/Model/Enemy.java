@@ -10,7 +10,6 @@ import java.util.Random;
 public abstract class Enemy extends Character{
 
     protected int damage;
-    protected List<Projectile> projectileList = new ArrayList<Projectile>();
     private int invulnTimer = 0;
     protected int invulnTicks = 10;
     protected int speed;
@@ -112,8 +111,8 @@ public abstract class Enemy extends Character{
         isStuck = stuck;
     }
 
-    private List<Point> patrolPoints;
-    private int pointIndex;
+    protected List<Point> patrolPoints;
+    protected int pointIndex;
 
 
     protected void initPatrol(){

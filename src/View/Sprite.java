@@ -74,8 +74,11 @@ public class Sprite {
     //Will draw the image stored in the sprite onto the graphics canvas passed through
     //Should oly be accessed from View
     public void drawSprite(Graphics2D g){
+
+
         g.drawImage(image.getImage(), x, y, null);
     }
+
 
     //Loads the image specified in s to a BufferedImage
     public void setImage(String s){
