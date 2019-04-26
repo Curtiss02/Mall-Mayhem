@@ -2,6 +2,8 @@ package Model;
 import View.Sprite;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public abstract class Character {
     protected double y;
@@ -12,6 +14,9 @@ public abstract class Character {
     protected boolean hasCollision = true;
     protected boolean isInvulnerable = false;
     protected Sprite sprite;
+
+    static List<Projectile> projectileList = new ArrayList<Projectile>();
+
     double xDirection;
     double yDirection;
 
@@ -84,5 +89,13 @@ public abstract class Character {
 
     public int getHeight() {
         return height;
+    }
+
+    public void addHealth(int health){
+        this.healthPoints += health;
+    }
+
+    public static List<Projectile> getProjectileList() {
+        return projectileList;
     }
 }

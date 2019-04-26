@@ -8,6 +8,9 @@ public class Pickup {
     private int x, y;
     private Sprite sprite;
     private int width, height;
+
+
+
     private Rectangle collisionBox;
     public enum TYPE{
         HEALTH,
@@ -33,6 +36,8 @@ public class Pickup {
             case SUPERSPEED:
                 break;
         }
+        width = sprite.getWidth();
+        height = sprite.getHeight();
         collisionBox = new Rectangle(x,y,width,height);
     }
 
@@ -42,5 +47,9 @@ public class Pickup {
 
     public Sprite getSprite() {
         return sprite;
+    }
+
+    public Rectangle getCollisionBox() {
+        return collisionBox;
     }
 }

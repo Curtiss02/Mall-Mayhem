@@ -1,8 +1,10 @@
 package Controller;
 
 
+import Model.Character;
 import View.*;
 import Model.*;
+import org.w3c.dom.css.Rect;
 
 
 import javax.swing.*;
@@ -121,14 +123,15 @@ public class GameController {
 
         spriteList = new ArrayList<Sprite>();
         levelList = new ArrayList<>();
-
-
         levelList.add(new StartLevel());
+        levelList.add(new Level2());
+
+
         levelIndex = 0;
         currentLevel = levelList.get(levelIndex);
         enemyList = currentLevel.getEnemyList();
         player = new Player(currentLevel.getPlayerStart().x,currentLevel.getPlayerStart().y);
-        projectileList = player.getProjectileList();
+        projectileList = Character.getProjectileList();
         pickupList = currentLevel.getPickupList();
         currentMap = currentLevel.getMap();
 
@@ -145,8 +148,6 @@ public class GameController {
     private void update(){
 
         moveEnemies();
-
-        projectileList = player.getProjectileList();
 
         moveProjectiles();
 
@@ -228,13 +229,29 @@ public class GameController {
         for(Rectangle thisTile : currentMap.getNextLevelCollision()){
             if(playerBound.intersects(thisTile)){
                 nextLevel();
+                break;
             }
         }
+        //Check player-pickup collisions
+        Iterator<Pickup> pickupIterator = pickupList.iterator();
+        while(pickupIterator.hasNext()){
+            Pickup thisPickup = pickupIterator.next();
+            if(playerBound.intersects(thisPickup.getCollisionBox())){
+                switch (thisPickup.getType()){
+                    case HEALTH:
+                        player.addHealth(10);
+                        break;
+                    case AMMO:
+                        break;
+                    case SUPERSHOT:
+                        break;
+                    case SUPERSPEED:
+                        break;
+                }
+                pickupIterator.remove();
 
-
-
-
-
+            }
+        }
 
         //If the playe currently has collision disabled, we dont need to check
         if(!player.isInvulnerable()) {
@@ -274,11 +291,20 @@ public class GameController {
 
         //CheckPlayerLevelCollsions();
         List<Rectangle> levelCollisions = currentMap.getCollisions();
+
+        //Check bounds in x and y direction to figue out which direction the collision occurs to smooth movement
+        Rectangle playerXBounds = player.getFutureBoundsX();
+        Rectangle playerYBounds = player.getFutureBoundsY();
         //Stop the player from walking through tiles on the collision layer
         for(int i = 0; i < levelCollisions.size(); i++){
             Rectangle currentTile = levelCollisions.get(i);
             if(playerBound.intersects(currentTile)){
-                player.stop();
+                if(playerXBounds.intersects(currentTile)){
+                    player.stopX();
+                }
+                if(playerYBounds.intersects(currentTile)){
+                    player.stopY();
+                }
             }
         }
 
@@ -324,6 +350,7 @@ public class GameController {
                             thisEnemy.takeDamage(thisProjectile.getDamage());
                         }
                         thisProjectile.takeDamage(99);
+                        break;
                     }
                 }
             }
@@ -335,6 +362,7 @@ public class GameController {
                         player.takeDamage(thisProjectile.getDamage());
                     }
                     thisProjectile.takeDamage(99);
+                    break;
                 }
             }
         }
@@ -422,28 +450,21 @@ public class GameController {
     }
 
 
-    private void IntroLevel() {
 
-    }
 
-    private void level2(){
-        spriteList.clear();
-        enemyList.clear();
-        projectileList.clear();
-        player.setX(1);
-        player.setY(1);
 
-    }
 
     private void nextLevel(){
+        System.out.println("NEXT LEVEL!");
         levelIndex++;
         currentLevel = levelList.get(levelIndex);
         currentMap = currentLevel.getMap();
         enemyList = currentLevel.getEnemyList();
         pickupList = currentLevel.getPickupList();
+        player.setX(currentLevel.getPlayerStart().x);
+        player.setY(currentLevel.getPlayerStart().y);
         view.setCurrentMap(currentMap);
     }
-
 
 
 

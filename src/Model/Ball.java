@@ -14,7 +14,7 @@ public class Ball extends Projectile {
 
         this.isEnemy = false;
         this.isPlayer = true;
-        this.damage = 2;
+        this.damage = 20;
         this.speed = 6;
 
         sprite = new Sprite(x, y);

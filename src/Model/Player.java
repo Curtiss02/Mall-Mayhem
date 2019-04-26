@@ -42,7 +42,7 @@ public class Player extends Character {
     }
     private Direction direction;
 
-    private List<Projectile> projectileList;
+
 
     public Player(int x, int y){
         this.x = x;
@@ -60,7 +60,7 @@ public class Player extends Character {
         this.yDirection = 0;
         this.xDirection = 1;
         this.direction = Direction.RIGHT;
-        this.healthPoints = 10;
+        this.healthPoints = 100;
         this.shootTimer = 0;
 
 
@@ -284,7 +284,17 @@ public class Player extends Character {
         }
     }
 
-    public List<Projectile> getProjectileList() {
-        return projectileList;
+
+    public Rectangle getFutureBoundsY(){
+        return new Rectangle((int)(x), (int)(y + dy), width, height);
+    }
+    public Rectangle getFutureBoundsX(){
+        return new Rectangle((int)(x+dx), (int)(y), width, height);
+    }
+    public void stopY(){
+        dy = 0;
+    }
+    public void stopX(){
+        dx = 0;
     }
 }

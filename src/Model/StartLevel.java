@@ -8,8 +8,7 @@ public class StartLevel extends Level {
 
     public StartLevel(){
 
-        enemyList = new ArrayList<Enemy>();
-        pickupList = new ArrayList<Pickup>();
+        super();
         playerStart = new Point(300,300);
         map = new Map("src/maps/intro.xml");
 
@@ -25,12 +24,12 @@ public class StartLevel extends Level {
 
 
     private void SpawnNPCs(){
-        final int zone1XMax = 576;
+        final int zone1XMax = 480;
         final int zone1XMin = 40;
         final int zone2XMax = 1400;
-        final int zone2XMin = 900;
+        final int zone2XMin = 992;
         final int yMax = 864;
-        final int yMin = 256;
+        final int yMin = 288;
         final int npcCount = 30;
         for (int i = 0; i < npcCount; i++) {
             Random random = new Random();

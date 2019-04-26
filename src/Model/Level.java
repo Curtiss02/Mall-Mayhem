@@ -12,6 +12,8 @@ public abstract class Level {
     protected Point playerStart;
 
     public Level(){
+        enemyList = new ArrayList<Enemy>();
+        pickupList = new ArrayList<Pickup>();
 
     }
 
