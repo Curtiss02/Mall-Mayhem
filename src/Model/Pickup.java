@@ -27,11 +27,12 @@ public class Pickup {
 
         switch (type){
             case HEALTH:
-                sprite.setImage("src/img/pickups/healthkit.png");
+                sprite.setImage("img/pickups/healthkit.png");
                 break;
             case AMMO:
                 break;
             case SUPERSHOT:
+                sprite.setImage("img/pickups/supershot.png");
                 break;
             case SUPERSPEED:
                 break;

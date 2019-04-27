@@ -15,7 +15,7 @@ public class CashBullet extends Projectile {
 
         sprite = new Sprite(x, y);
 
-        sprite.setImage("src/img/projectiles/cash.png");
+        sprite.setImage("img/projectiles/cash.png");
 
         this.width = sprite.getWidth();
         this.height = sprite.getHeight();

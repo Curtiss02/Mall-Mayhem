@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.zip.DeflaterInputStream;
 
 public class Player extends Character {
 
@@ -18,15 +19,15 @@ public class Player extends Character {
     private int shootTimer;
     private int invulnTimer;
 
-    private String walkUp = "src/img/player/walk-up.gif";
-    private String walkDown = "src/img/player/walk-down.gif";
-    private String walkLeft = "src/img/player/walk-left.gif";
-    private String walkRight = "src/img/player/walk-right.gif";
-    private String stillUp = "src/img/player/stand-up.png";
-    private String stillDown = "src/img/player/stand-down.png";
-    private String stillLeft = "src/img/player/stand-left.png";
-    private String stillRight = "src/img/player/stand-right.png";
-    private boolean superShot = true;
+    private String walkUp = "img/player/walk-up.gif";
+    private String walkDown = "img/player/walk-down.gif";
+    private String walkLeft = "img/player/walk-left.gif";
+    private String walkRight = "img/player/walk-right.gif";
+    private String stillUp = "img/player/stand-up.png";
+    private String stillDown = "img/player/stand-down.png";
+    private String stillLeft = "img/player/stand-left.png";
+    private String stillRight = "img/player/stand-right.png";
+    private boolean superShot = false;
 
 
     private enum Direction{
@@ -44,14 +45,18 @@ public class Player extends Character {
 
 
 
+
     public Player(int x, int y){
         this.x = x;
         this.y = y;
         sprite = new Sprite(x,y);
-        setSprite("src/img/player/stand-right.png");
+        setSprite("img/player/stand-right.png");
         this.width = sprite.getWidth();
         this.height = sprite.getHeight();
         this.projectileList = new ArrayList<Projectile>();
+        if(healthPoints > 100){
+            healthPoints = 100;
+        }
 
         projectileHeight = new Ball(0,0,0,0).getHeight();
         projectileWidth =  new Ball(0,0,0,0).getWidth();
@@ -284,17 +289,9 @@ public class Player extends Character {
         }
     }
 
+    public void setSuperShot(boolean superShot) {
+        this.superShot = superShot;
+    }
 
-    public Rectangle getFutureBoundsY(){
-        return new Rectangle((int)(x), (int)(y + dy), width, height);
-    }
-    public Rectangle getFutureBoundsX(){
-        return new Rectangle((int)(x+dx), (int)(y), width, height);
-    }
-    public void stopY(){
-        dy = 0;
-    }
-    public void stopX(){
-        dx = 0;
-    }
+
 }

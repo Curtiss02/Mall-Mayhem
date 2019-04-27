@@ -1,5 +1,7 @@
 package Model;
 
+import View.Sprite;
+
 import java.awt.*;
 
 public class Boss extends Enemy {
@@ -11,17 +13,30 @@ public class Boss extends Enemy {
     private final int burstCooldown = 20;
     private final int shootCooldown = 120;
 
+    private Sprite right;
+    private Sprite left;
+
+
     public Boss(int x, int y){
         super(x,y);
-        setSprite("src/img/enemies/tommyg-right.png");
+        setSprite("img/enemies/tommyg-right.png");
         width = sprite.getWidth();
         height = sprite.getHeight();
         speed = 1;
         damage = 20;
-        healthPoints = 1000;
+        right = new Sprite(x,y);
+        right.setImage("img/enemies/tommyg-right.png");
+        left = new Sprite(x,y);
+        left.setImage("img/enemies/tommyg-left.png");
+
+        sprite = right;
+
+
         initPatrol();
-        addPatrolPoint(new Point(300,300));
-        addPatrolPoint(new Point(300,900));
+
+        healthPoints = 1000;
+
+
     }
 
     @Override
@@ -57,9 +72,20 @@ public class Boss extends Enemy {
 
     }
 
+    @Override
+    public void moveLeft() {
+        super.moveLeft();
+        sprite = left;
+    }
+
+    @Override
+    public void moveRight() {
+        super.moveRight();
+        sprite = right;
+    }
 
     public void shoot(){
-        System.out.println("SHOOTING NOW");
+
         //projectileList.add(new Ball(x,y, 1,1));
         for(int i = 0; i < 360; i+= 10){
             double rads = Math.toRadians(i);

@@ -29,6 +29,12 @@ public class GUIPanel extends JPanel {
 
     private int playerHealth;
 
+    private int score = 0;
+    private int tempScore = 0;
+    private boolean scoreScreen = false;
+
+    private boolean isGameOver = false;
+
 
 
     public GUIPanel() {
@@ -65,6 +71,7 @@ public class GUIPanel extends JPanel {
 
         }
         drawSprites(g2d);
+
         if(currentMap != null) {
             currentMap.drawTop(g2d);
 
@@ -72,6 +79,12 @@ public class GUIPanel extends JPanel {
 
         drawFPS(g);
         drawHealth(g);
+        if(scoreScreen){
+            drawScoreScreen(g);
+        }
+        if(isGameOver){
+            drawGameOver(g);
+        }
 
         Toolkit.getDefaultToolkit().sync();
 
@@ -117,6 +130,73 @@ public class GUIPanel extends JPanel {
         g.setColor(Color.BLACK);
     }
 
+    public void setScore(int score){
+        this.score = score;
+    }
+    public void enableScoreScreen(){
+        scoreScreen = true;
+    }
+
+    public void setGameOver(){
+
+
+    }
+
+    private void drawScoreScreen(Graphics g){
+        Color seeThroughGrey = new Color(0,0,0, 100);
+        g.setColor(seeThroughGrey);
+        Font myFont = new Font ("Courier New", 1, 52);
+        String scoreText = "Score:";
+
+        FontMetrics metrics = g.getFontMetrics(myFont);
+
+        int x1 = (GAME_WIDTH - metrics.stringWidth(scoreText)) / 2;
+
+
+
+        String stringScore;
+
+        g.setFont(myFont);
+        g.fillRect(0,0,GAME_WIDTH,GAME_HEIGHT);
+        g.setColor(Color.WHITE);
+        g.drawString("SCORE:", x1, 250);
+        if(tempScore < score){
+            stringScore = String.valueOf(tempScore);
+            tempScore += 10;
+        }
+        else{
+            stringScore = String.valueOf(score);
+        }
+        int x2 = (GAME_WIDTH - metrics.stringWidth(stringScore)) / 2;
+        g.drawString(String.valueOf(stringScore), x2, 300);
+
+    }
+
+
+    private int gameOverFontSize = 1;
+    private void drawGameOver(Graphics g){
+
+        Color seeThroughGrey = new Color(0,0,0, 100);
+        g.setColor(seeThroughGrey);
+        g.fillRect(0,0,GAME_WIDTH,GAME_HEIGHT);
+        g.setColor(Color.RED);
+
+        Font myFont = new Font ("Courier New", 1, gameOverFontSize);
+        g.setFont(myFont);
+        if(gameOverFontSize < 100){
+            gameOverFontSize++;
+        }
+        String gameOver = "GAME OVER";
+
+        FontMetrics metrics = g.getFontMetrics(myFont);
+
+        int x = (GAME_WIDTH - metrics.stringWidth(gameOver)) / 2;
+        int y = ((GAME_HEIGHT - metrics.getHeight()) / 2) + metrics.getAscent();
+        g.drawString(gameOver, x, y);
+
+
+    }
+
     public void setCurrentMap(Map currentMap) {
         this.currentMap = currentMap;
     }
@@ -125,6 +205,10 @@ public class GUIPanel extends JPanel {
         g.drawString(fpsCounter, 1, 30);
     }
 
+    public void setGameOver(boolean gameOver) {
+
+        isGameOver = gameOver;
+    }
 
     private class TAdapter extends KeyAdapter {
 

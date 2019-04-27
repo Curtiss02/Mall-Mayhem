@@ -10,14 +10,17 @@ public class StartLevel extends Level {
 
         super();
         playerStart = new Point(300,300);
-        map = new Map("src/maps/intro.xml");
+        playerExit = new Point(23*32, 64);
+        map = new Map("maps/intro.xml");
 
-        Pickup healthKit = new Pickup( 300, 300, Pickup.TYPE.HEALTH);
+        Pickup healthKit = new Pickup( 1000, 300, Pickup.TYPE.HEALTH);
         pickupList.add(healthKit);
 
 
 
         //Add to list of sprites being drawn
+
+
         SpawnNPCs();
 
     }

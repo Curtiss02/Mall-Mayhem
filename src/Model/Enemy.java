@@ -101,15 +101,16 @@ public abstract class Enemy extends Character{
         }
 
         x += dx;
-        y += dy;
 
-        this.sprite.setY((int)y);
-        this.sprite.setX((int)x);
+        y += dy;
+        sprite.setY((int) y);
+        sprite.setX((int) x);
     }
 
     public void setStuck(boolean stuck) {
         isStuck = stuck;
     }
+
 
     protected List<Point> patrolPoints;
     protected int pointIndex;
@@ -214,12 +215,11 @@ public abstract class Enemy extends Character{
         //Check if we have reached the current destination
         if((this.x == currentDestination.x) && (this.y == currentDestination.y)){
             getNewMeanderPoint();
-            //System.out.println("REACDHED DEST");
+
             isWaiting = true;
             Random random = new Random();
             waitValue = random.nextInt(maxWait - minWait) + minWait;
 
-            //System.out.println("Wait value: " + waitValue);
 
         }
 

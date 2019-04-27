@@ -6,6 +6,8 @@ import javax.imageio.*;
 import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 
 public class Sprite {
     //
@@ -82,8 +84,10 @@ public class Sprite {
 
     //Loads the image specified in s to a BufferedImage
     public void setImage(String s){
+        URL url =  this.getClass().getClassLoader().getResource(s);
 
-        image = new ImageIcon(s);
+        image = new ImageIcon(url);
+
 
         width = image.getIconWidth();
         height = image.getIconHeight();

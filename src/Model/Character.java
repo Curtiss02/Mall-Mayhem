@@ -98,4 +98,18 @@ public abstract class Character {
     public static List<Projectile> getProjectileList() {
         return projectileList;
     }
+    public Rectangle getFutureBoundsY(){
+        return new Rectangle((int)(x), (int)(y + dy), width, height);
+    }
+    public Rectangle getFutureBoundsX(){
+        return new Rectangle((int)(x+dx), (int)(y), width, height);
+    }
+    public void stopY(){
+        dy = 0;
+    }
+
+    public void stopX(){
+        dx = 0;
+    }
+
 }

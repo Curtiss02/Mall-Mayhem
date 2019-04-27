@@ -19,7 +19,7 @@ public class Ball extends Projectile {
 
         sprite = new Sprite(x, y);
 
-        sprite.setImage("src/img/ball.png");
+        sprite.setImage("img/ball.png");
 
         this.width = sprite.getWidth();
         this.height = sprite.getHeight();

@@ -15,7 +15,7 @@ public class Bullet extends Projectile{
 
         sprite = new Sprite(x, y);
 
-        sprite.setImage("src/img/projectiles/bullet.png");
+        sprite.setImage("img/projectiles/bullet.png");
 
         this.width = sprite.getWidth();
         this.height = sprite.getHeight();

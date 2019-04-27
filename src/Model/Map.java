@@ -5,12 +5,14 @@ import javax.xml.parsers.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import org.w3c.dom.*;
-import org.w3c.dom.css.Rect;
+
+
 
 public class Map {
 
@@ -20,6 +22,8 @@ public class Map {
     private List<TileSet> tilesets;
     private List<Rectangle> collisions;
     private List<Rectangle> nextLevelCollision;
+    private List<Rectangle> prevLevelCollisions;
+    private List<Rectangle> spawnAreaCollisions;
 
     private int tileWidth;
     private int mapWidth;
@@ -28,8 +32,10 @@ public class Map {
     private int[][] backgroundTileData;
     private int[][] collisionTileData;
     private int[][] topTileData;
-    private int[][] levelChangeTileData;
+    private int[][] nextLevelTileData;
+    private int[][] prevLevelTileData;
 
+    private int[][] spawnAreaTileData;
 
     public Map(String xmlFile) {
         backgroundLayers = new ArrayList<BufferedImage>();
@@ -37,6 +43,8 @@ public class Map {
         topLayers = new ArrayList<BufferedImage>();
         collisions = new ArrayList<Rectangle>();
         nextLevelCollision = new ArrayList<Rectangle>();
+        prevLevelCollisions = new ArrayList<Rectangle>();
+        spawnAreaCollisions = new ArrayList<Rectangle>();
 
         loadXML(xmlFile);
     }
@@ -56,10 +64,10 @@ public class Map {
         try {
 
             //Read in map data XML file
-            File inputFile = new File(xmlFile);
+            URL url = this.getClass().getClassLoader().getResource(xmlFile);
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-            Document doc = dBuilder.parse(inputFile);
+            Document doc = dBuilder.parse(url.openStream());
             doc.getDocumentElement().normalize();
 
             Element map = (Element) doc.getElementsByTagName("map").item(0);
@@ -75,7 +83,7 @@ public class Map {
 
 
             for (int i = 0; i < tilesetNodes.getLength(); i++) {
-                System.out.println("Accessing" + i);
+
                 Node tempNode = tilesetNodes.item(0);
                 Element tilesetNode = (Element) tilesetNodes.item(i);
 
@@ -131,13 +139,13 @@ public class Map {
 
                     tileData[tileX] = new int[mapHeight];
 
-                    System.out.printf("[");
+
 
                     for (int tileY = 0; tileY < mapHeight; tileY++) {
                         tileData[tileX][tileY] = linearTiles.get((tileX + (tileY * mapWidth)));
 
                     }
-                    System.out.printf("]\n");
+
 
                 }
 
@@ -185,8 +193,16 @@ public class Map {
                         topTileData = tileData;
                         break;
                     case "NextLevel":
-                        levelChangeTileData = tileData;
-                        createCollisionData(nextLevelCollision, levelChangeTileData);
+                        nextLevelTileData = tileData;
+                        createCollisionData(nextLevelCollision, nextLevelTileData);
+                        break;
+                    case "PrevLevel":
+                        prevLevelTileData = tileData;
+                        createCollisionData(prevLevelCollisions, prevLevelTileData);
+                        break;
+                    case "SpawnArea":
+                        spawnAreaTileData = tileData;
+                        createCollisionData(spawnAreaCollisions, spawnAreaTileData);
                     default:
                         break;
                 }
@@ -243,6 +259,14 @@ public class Map {
 
     public List<Rectangle> getNextLevelCollision() {
         return nextLevelCollision;
+    }
+
+    public List<Rectangle> getPrevLevelCollisions(){
+        return prevLevelCollisions;
+    }
+
+    public List<Rectangle> getSpawnAreaCollisions() {
+        return spawnAreaCollisions;
     }
 }
 

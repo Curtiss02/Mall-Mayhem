@@ -10,6 +10,7 @@ public abstract class Level {
     protected List<Enemy> enemyList;
     protected List<Pickup> pickupList;
     protected Point playerStart;
+    protected Point playerExit;
 
     public Level(){
         enemyList = new ArrayList<Enemy>();
@@ -31,5 +32,9 @@ public abstract class Level {
 
     public Point getPlayerStart() {
         return playerStart;
+    }
+
+    public Point getPlayerExit() {
+        return playerExit;
     }
 }
