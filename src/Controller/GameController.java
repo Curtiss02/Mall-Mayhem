@@ -1,6 +1,8 @@
 package Controller;
 
 
+import Audio.MusicPlayer;
+import Audio.SoundPlayer;
 import Model.Character;
 import View.*;
 import Model.*;
@@ -9,6 +11,7 @@ import Model.*;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.security.Key;
 import java.util.Iterator;
 import java.util.Random;
 
@@ -16,10 +19,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+
 public class GameController {
 
     //Setup game timer, each game tick the game is refreshed and certain logic is calculated
-    private Timer gameTimer;
+
 
     private final int FPS = 60;
     private int UPS = 120;
@@ -33,7 +37,7 @@ public class GameController {
     private GUIPanel view;
 
     private int score = 0;
-
+    private int globalTimer = 300;
 
 
     private Map currentMap;
@@ -48,6 +52,8 @@ public class GameController {
 
     private List<Pickup> pickupList;
 
+
+
     private List<Level> levelList;
     private int levelIndex;
     private Level currentLevel;
@@ -55,6 +61,9 @@ public class GameController {
     private boolean isPaused = false;
 
     public GameController() {}
+
+    private SoundPlayer soundPlayer = new SoundPlayer();
+    private MusicPlayer musicPlayer = new MusicPlayer();
 
     public void setView(GUIPanel view) {
         this.view = view;
@@ -65,6 +74,8 @@ public class GameController {
         init();
         gameLoop();
     }
+
+
 
     private void gameLoop() {
 
@@ -85,7 +96,8 @@ public class GameController {
 
             if (deltaU >= 1) {
                 getInput();
-                if(!isPaused) {
+
+                if(!isPaused && GUIPanel.State == GUIPanel.STATE.GAME) {
                     update();
 
                 }
@@ -105,7 +117,14 @@ public class GameController {
             if (System.currentTimeMillis() - timer > 1000) {
                 view.UpdateFPS(frames, ticks);
                 System.out.println(String.format("Ticks/second: %s, FPS: %s", ticks, frames));
+                if(GUIPanel.State == GUIPanel.STATE.GAME && globalTimer > 0){
+                    globalTimer -= 1;
+                    view.setTimer(globalTimer);
+                }
+                if(globalTimer == 0){
+                    gameOver();
 
+                }
                 frames = 0;
                 ticks = 0;
                 timer += 1000;
@@ -118,25 +137,22 @@ public class GameController {
     private void init(){
         //Create a new player
 
-
-
-
-
-        spriteList = new ArrayList<Sprite>();
-        new Shopper(1,1);
+        musicPlayer.playMusic("sounds/mallmusic.wav");
+        spriteList = new ArrayList<>();
         levelList = new ArrayList<>();
         levelList.add(new StartLevel());
         levelList.add(new Level2());
         levelList.add(new Level3());
         levelList.add(new BossLevel());
 
-
+        musicPlayer = new MusicPlayer();
         levelIndex = 0;
         currentLevel = levelList.get(levelIndex);
         enemyList = currentLevel.getEnemyList();
         player = new Player(currentLevel.getPlayerStart().x,currentLevel.getPlayerStart().y);
         pickupList = currentLevel.getPickupList();
         currentMap = currentLevel.getMap();
+
 
 
 
@@ -149,6 +165,8 @@ public class GameController {
 
     // Will evetually include function which will tick() trough every currentl used entity
     private void update(){
+
+
         projectileList = Character.getProjectileList();
 
         levelSpecificChecks();
@@ -172,6 +190,12 @@ public class GameController {
         cleanupEnemies();
 
         updateSprites();
+
+        if(SettingsMenu.soundOn == 1) {
+            playSounds();
+        }
+
+        checkMusic();
 
         updateGUI();
 
@@ -235,7 +259,7 @@ public class GameController {
     }
     private void checkCollisions(){
 
-
+        checkProjectileCollisions();
 
         checkPlayerMapCollisions();
 
@@ -258,7 +282,7 @@ public class GameController {
 
 
 
-        checkProjectileCollisions();
+
 
 
     }
@@ -408,6 +432,7 @@ public class GameController {
                 if(projectileBounds.intersects(playerBound)){
                     if(player.isInvulnerable() == false){
                         player.takeDamage(thisProjectile.getDamage());
+                        player.knockBack(thisProjectile.getXDirection(), thisProjectile.getYDirection(), 5);
                     }
                     thisProjectile.takeDamage(99);
                     break;
@@ -463,6 +488,9 @@ public class GameController {
             }
 
         }
+        if(keyPresses[KeyEvent.VK_ESCAPE]){
+            System.exit(0);
+        }
         if(!isPaused) {
             if (keyPresses[KeyEvent.VK_A]) {
                 player.moveLeft();
@@ -483,10 +511,20 @@ public class GameController {
             if (keyPresses[KeyEvent.VK_PAGE_DOWN]){
                 skipToEnd();
             }
+
         }
 
 
 
+
+    }
+
+    private void playSounds(){
+        List<String> soundList = Character.getSoundList();
+        for(String s : soundList){
+            soundPlayer.playSound(s);
+        }
+        soundList.clear();
     }
 
     private boolean isOffScreen(int x, int y, int width, int height){
@@ -545,8 +583,7 @@ public class GameController {
         }
         if(levelIndex == 3){
             if(enemyList.isEmpty()) {
-                scoreScreen();
-
+                gameWon();
 
             }
 
@@ -567,20 +604,54 @@ public class GameController {
     }
 
     private int endGameTimer = 0;
+
+
+    private int finalScore;
     private void scoreScreen(){
-
-        view.setScore(score);
+        player.setInvulnerable(true);
+        view.setScore(finalScore);
         view.enableScoreScreen();
-        endGameTimer++;
 
+
+
+    }
+    private boolean gameoverdoneOnce = false;
+
+    private void gameWon(){
+        if(!gameoverdoneOnce) {
+            globalTimer = -1;
+            finalScore = (int) (score * (5 + (0.00F * globalTimer)));
+            HighScoreMenu.addHighScore(finalScore);
+            view.setGameWon(true);
+            scoreScreen();
+            gameoverdoneOnce = true;
+        }
     }
 
     private void gameOver(){
-        view.setGameOver(true);
-        player.setY(99999);
-        player.setX(99999);
-        player.getSprite().setVisible(false);
-        endGameTimer++;
+        if(!gameoverdoneOnce) {
+            globalTimer = -1;
+            view.setTimer(0);
+            view.setGameOver(true);
+            finalScore = (int) (score * (5));
+            soundPlayer.playSound("sounds/lose.wav");
+            HighScoreMenu.addHighScore(finalScore);
+            scoreScreen();
+            player.setY(99999);
+            player.setX(99999);
+            player.getSprite().setVisible(false);
+            gameoverdoneOnce = true;
+        }
+
+    }
+
+    private void checkMusic(){
+        if(SettingsMenu.musicOn == 0){
+            musicPlayer.pause();
+        }
+        else{
+            musicPlayer.resume();
+        }
     }
 
 

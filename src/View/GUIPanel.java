@@ -1,14 +1,23 @@
 package View;
 
+import Controller.MouseInput;
 import Model.Map;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.InputStream;
+import java.net.URL;
+import java.security.Key;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class GUIPanel extends JPanel {
 
@@ -29,11 +38,31 @@ public class GUIPanel extends JPanel {
 
     private int playerHealth;
 
+    private String fontString = "font/joystix.ttf";
+
+    private URL fontURL;
+
+    private Font myFont;
+
+    public enum STATE {
+        MENU,
+        GAME,
+        PAUSE,
+        QUIT,
+        SETTINGS,
+        HIGHSCORES
+
+    };
     private int score = 0;
     private int tempScore = 0;
     private boolean scoreScreen = false;
 
     private boolean isGameOver = false;
+    public static STATE State = STATE.MENU;
+    private Menu menu = new Menu();
+    private QuitMenu quitmenu = new QuitMenu();
+    private SettingsMenu settingsMenu = new SettingsMenu();
+    private HighScoreMenu highScoreMenu = new HighScoreMenu();
 
 
 
@@ -49,14 +78,22 @@ public class GUIPanel extends JPanel {
         // Must add key listener to panel in order to actually receive keybaord inputs
         addKeyListener(new TAdapter());
 
-        keyPresses = new Boolean[256];
+        keyPresses = new Boolean[1000];
         Arrays.fill(keyPresses, Boolean.FALSE);
+
+        InputStream stream = ClassLoader.getSystemClassLoader().getResourceAsStream(fontString);
+        try {
+            myFont = Font.createFont(Font.TRUETYPE_FONT, stream).deriveFont(48f);
+
+        }catch (Exception e){}
+
 
 
         setBackground(Color.WHITE);
         //Panel must be focusable in order to accept user input
         setFocusable(true);
 
+        this.addMouseListener(new MouseInput());
 
 
     }
@@ -65,6 +102,7 @@ public class GUIPanel extends JPanel {
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
+    if(State == STATE.GAME) {
         Graphics2D g2d = (Graphics2D) g;
         if(currentMap != null) {
             currentMap.drawBackground(g2d);
@@ -76,16 +114,43 @@ public class GUIPanel extends JPanel {
             currentMap.drawTop(g2d);
 
         }
+        // Debugging functions
+        //drawFPS(g);
+        //drawHealth(g);
 
-        drawFPS(g);
-        drawHealth(g);
-        if(scoreScreen){
-            drawScoreScreen(g);
-        }
         if(isGameOver){
             drawGameOver(g);
         }
+        if(gameWon){
+            drawGameWon(g);
+        }
+        if(scoreScreen){
+            drawScoreScreen(g);
+        }
 
+            g.setFont(myFont);
+
+            drawHealthBar(g);
+            drawTime(g);
+
+
+        }
+
+        else if(State == STATE.MENU) {
+            menu.render(g);
+        }
+
+        else if(State == STATE.QUIT){
+            quitmenu.render(g);
+        }
+
+        else if(State == STATE.SETTINGS){
+            settingsMenu.render(g);
+        }
+        else if(State == STATE.HIGHSCORES){
+            highScoreMenu.render(g);
+
+    }
         Toolkit.getDefaultToolkit().sync();
 
 
@@ -142,10 +207,10 @@ public class GUIPanel extends JPanel {
 
     }
 
-    private void drawScoreScreen(Graphics g){
-        Color seeThroughGrey = new Color(0,0,0, 100);
-        g.setColor(seeThroughGrey);
-        Font myFont = new Font ("Courier New", 1, 52);
+    private void drawScoreScreen(Graphics g) {
+
+
+        g.setFont(myFont);
         String scoreText = "Score:";
 
         FontMetrics metrics = g.getFontMetrics(myFont);
@@ -157,12 +222,12 @@ public class GUIPanel extends JPanel {
         String stringScore;
 
         g.setFont(myFont);
-        g.fillRect(0,0,GAME_WIDTH,GAME_HEIGHT);
+
         g.setColor(Color.WHITE);
         g.drawString("SCORE:", x1, 250);
         if(tempScore < score){
             stringScore = String.valueOf(tempScore);
-            tempScore += 10;
+            tempScore += 100;
         }
         else{
             stringScore = String.valueOf(score);
@@ -181,19 +246,30 @@ public class GUIPanel extends JPanel {
         g.fillRect(0,0,GAME_WIDTH,GAME_HEIGHT);
         g.setColor(Color.RED);
 
-        Font myFont = new Font ("Courier New", 1, gameOverFontSize);
+
+
+
         g.setFont(myFont);
         if(gameOverFontSize < 100){
             gameOverFontSize++;
         }
+
+        Font gameOverFont = myFont.deriveFont((float)gameOverFontSize);
+        g.setFont(gameOverFont);
         String gameOver = "GAME OVER";
 
-        FontMetrics metrics = g.getFontMetrics(myFont);
+        FontMetrics metrics = g.getFontMetrics(gameOverFont);
 
         int x = (GAME_WIDTH - metrics.stringWidth(gameOver)) / 2;
         int y = ((GAME_HEIGHT - metrics.getHeight()) / 2) + metrics.getAscent();
         g.drawString(gameOver, x, y);
 
+        if(gameOverFontSize >= 100) {
+            String esc = "Press ESC to quit";
+            x = (GAME_WIDTH - metrics.stringWidth(esc)) / 2;
+            y = GAME_HEIGHT/2+((GAME_HEIGHT/2 - metrics.getHeight()) / 2) + metrics.getAscent();
+            g.drawString(esc, x, y);
+        }
 
     }
 
@@ -208,6 +284,11 @@ public class GUIPanel extends JPanel {
     public void setGameOver(boolean gameOver) {
 
         isGameOver = gameOver;
+    }
+    private boolean gameWon = false;
+
+    public void setGameWon(boolean gameWon){
+        this.gameWon = gameWon;
     }
 
     private class TAdapter extends KeyAdapter {
@@ -230,4 +311,59 @@ public class GUIPanel extends JPanel {
     public Boolean[] getKeyPresses() {
         return keyPresses;
     }
+
+    private void drawHealthBar(Graphics g){
+        Font healthFont = myFont.deriveFont(24L);
+        g.setFont(healthFont);
+        g.drawString("HEALTH", 1000, 45);
+        g.setColor(Color.WHITE);
+        g.fillRect(1130,20,300, 30);
+        g.setColor(Color.RED);
+        g.fillRect(1130, 20, playerHealth * 3, 30);
+        g.setColor(Color.BLACK);
+        g.drawRect(1130,20, 300, 30);
+    }
+
+    private String timerString = "5:00";
+    public void setTimer(int time){
+        Long mins = (TimeUnit.SECONDS.toMinutes(time));
+        Long seconds = time - (mins * 60);
+        timerString = "" + mins + ":" + String.format("%02d", seconds);
+    }
+    public void drawTime(Graphics g){
+        g.setFont(myFont);
+        g.setColor(Color.WHITE);
+        g.drawString(timerString,30,50);
+    }
+    private void drawGameWon(Graphics g){
+        Color seeThroughGrey = new Color(0,0,0, 100);
+        g.setColor(seeThroughGrey);
+        g.fillRect(0,0,GAME_WIDTH,GAME_HEIGHT);
+        g.setColor(Color.WHITE);
+
+
+
+
+        g.setFont(myFont);
+        if(gameOverFontSize < 100){
+            gameOverFontSize++;
+        }
+
+        Font gameOverFont = myFont.deriveFont((float)gameOverFontSize);
+        g.setFont(gameOverFont);
+        String gameOver = "YOU WIN";
+
+        FontMetrics metrics = g.getFontMetrics(gameOverFont);
+
+        int x = (GAME_WIDTH - metrics.stringWidth(gameOver)) / 2;
+        int y = ((GAME_HEIGHT - metrics.getHeight()) / 2) + metrics.getAscent();
+        g.drawString(gameOver, x, y);
+        if(gameOverFontSize >= 100) {
+            String esc = "Press ESC to quit";
+            x = (GAME_WIDTH - metrics.stringWidth(esc)) / 2;
+            y = GAME_HEIGHT/2+((GAME_HEIGHT/2 - metrics.getHeight()) / 2) + metrics.getAscent();
+            g.drawString(esc, x, y);
+        }
+    }
+
 }

@@ -55,12 +55,7 @@ public class Map {
 
     private void loadXML(String xmlFile) {
 
-/*
-        if(tileSet == null) {
-            System.out.println("No Tileset loaded");
-        }
-        else{
-*/
+
         try {
 
             //Read in map data XML file

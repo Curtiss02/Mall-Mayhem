@@ -15,6 +15,8 @@ public abstract class Character {
     protected boolean isInvulnerable = false;
     protected Sprite sprite;
 
+    static List<String> soundList = new ArrayList<>();
+
     static List<Projectile> projectileList = new ArrayList<Projectile>();
 
     double xDirection;
@@ -110,6 +112,14 @@ public abstract class Character {
 
     public void stopX(){
         dx = 0;
+    }
+
+    public static List<String> getSoundList(){
+
+        return soundList;
+    }
+    public static void clearSoundList(){
+        soundList.clear();
     }
 
 }

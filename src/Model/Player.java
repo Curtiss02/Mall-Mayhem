@@ -20,7 +20,7 @@ public class Player extends Character {
 
     private final int speed = 1;
     private final int invulnTicks = 60;
-    private final int shootCooldown = 20;
+    private final int shootCooldown = 35;
 
     private int shootTimer;
     private int invulnTimer;
@@ -35,8 +35,25 @@ public class Player extends Character {
     private String stillDown = "img/player/stand-down.png";
     private String stillLeft = "img/player/stand-left.png";
     private String stillRight = "img/player/stand-right.png";
+
+    private String hurtwalkUp = "img/player/walk-up-hurt.gif";
+    private String hurtwalkDown = "img/player/walk-down-hurt.gif";
+    private String hurtwalkLeft = "img/player/walk-left-hurt.gif";
+    private String hurtwalkRight = "img/player/walk-right-hurt.gif";
+    private String hurtstillUp = "img/player/stand-up-hurt.png";
+    private String hurtstillDown = "img/player/stand-down-hurt.png";
+    private String hurtstillLeft = "img/player/stand-left-hurt.png";
+    private String hurtstillRight = "img/player/stand-right-hurt.png";
+
+    private String shootSound = "sounds/pewhigh.wav";
+    private String hurtSound = "sounds/hurt.wav";
+
+
+
+
     private boolean superShot = false;
 
+    private boolean isHurt = false;
 
     private enum Direction{
         UP,
@@ -101,52 +118,93 @@ public class Player extends Character {
         if(healthPoints > 100){
             healthPoints = 100;
         }
-        switch (direction) {
+        if(isHurt) {
+            switch (direction) {
 
-            case UP:
-                sprite.setImage(stillUp);
-                break;
-            case DOWN:
-                sprite.setImage(stillDown);
-                break;
-            case LEFT:
-                sprite.setImage(stillLeft);
-                break;
-            case RIGHT:
-                sprite.setImage(stillRight);
-                break;
-            case UP_LEFT:
-                sprite.setImage(stillLeft);
-                break;
-            case UP_RIGHT:
-                sprite.setImage(stillRight);
-                break;
-            case DOWN_LEFT:
-                sprite.setImage(stillLeft);
-                break;
-            case DOWN_RIGHT:
-                sprite.setImage(stillRight);
-                break;
+                case UP:
+                    sprite.setImage(hurtstillUp);
+                    break;
+                case DOWN:
+                    sprite.setImage(hurtstillDown);
+                    break;
+                case LEFT:
+                    sprite.setImage(hurtstillLeft);
+                    break;
+                case RIGHT:
+                    sprite.setImage(hurtstillRight);
+                    break;
+                case UP_LEFT:
+                    sprite.setImage(hurtstillLeft);
+                    break;
+                case UP_RIGHT:
+                    sprite.setImage(hurtstillRight);
+                    break;
+                case DOWN_LEFT:
+                    sprite.setImage(hurtstillLeft);
+                    break;
+                case DOWN_RIGHT:
+                    sprite.setImage(hurtstillRight);
+                    break;
+            }
         }
+        else{
+            switch (direction) {
+
+                case UP:
+                    sprite.setImage(stillUp);
+                    break;
+                case DOWN:
+                    sprite.setImage(stillDown);
+                    break;
+                case LEFT:
+                    sprite.setImage(stillLeft);
+                    break;
+                case RIGHT:
+                    sprite.setImage(stillRight);
+                    break;
+                case UP_LEFT:
+                    sprite.setImage(stillLeft);
+                    break;
+                case UP_RIGHT:
+                    sprite.setImage(stillRight);
+                    break;
+                case DOWN_LEFT:
+                    sprite.setImage(stillLeft);
+                    break;
+                case DOWN_RIGHT:
+                    sprite.setImage(stillRight);
+                    break;
+            }
         }
+    }
     public void reverse(){
         dx = -dx;
         dy = -dy;
     }
 
-    public void knockBack(int xDirection, int yDirection, int distance){
+    public void knockBack(double xDirection, double yDirection, int distance){
         dx = distance*xDirection;
         dy = distance*yDirection;
     }
     public void moveLeft(){
         dx = -speed;
         direction = Direction.LEFT;
-        sprite.setImage(walkLeft);
+        if(isHurt){
+            sprite.setImage(hurtwalkLeft);
+        }
+        else {
+            sprite.setImage(walkLeft);
+        }
     }
     public void moveRight(){
         dx = speed;
         direction = Direction.RIGHT;
-        sprite.setImage(walkRight);
+        if(isHurt){
+            sprite.setImage(hurtwalkRight);
+        }
+        else {
+            sprite.setImage(walkRight);
+        }
     }
     public void moveUp(){
         dy = -speed;
@@ -159,7 +217,12 @@ public class Player extends Character {
         else{
             direction = Direction.UP;
         }
-        sprite.setImage(walkUp);
+        if(isHurt){
+            sprite.setImage(hurtwalkUp);
+        }
+        else {
+            sprite.setImage(walkUp);
+        }
     }
     public void moveDown(){
         dy = speed;
@@ -174,7 +237,12 @@ public class Player extends Character {
         else{
             direction = Direction.DOWN;
         }
-        sprite.setImage(walkDown);
+        if(isHurt){
+            sprite.setImage(hurtwalkDown);
+        }
+        else {
+            sprite.setImage(walkDown);
+        }
     }
 
     public void sprint(){
@@ -185,7 +253,7 @@ public class Player extends Character {
 
     public void shoot(){
         if(shootTimer == 0) {
-
+            soundList.add(shootSound);
             if(superShot) {
                 for (Direction direction : Direction.values()) {
                     setXandYDirection(direction);
@@ -212,11 +280,17 @@ public class Player extends Character {
         if(healthPoints > 100){
             healthPoints = 100;
         }
+        else if (healthPoints <= 0){
+
+            healthPoints = 0;
+            shootTimer = 1;
+        }
         if(isInvulnerable){
             invulnTimer++;
         }
         if(invulnTimer >= invulnTicks){
             setInvulnerable(false);
+            isHurt = false;
             invulnTimer = 0;
         }
 
@@ -305,5 +379,12 @@ public class Player extends Character {
         this.superShot = superShot;
     }
 
-
+    @Override
+    public void takeDamage(int damage) {
+        super.takeDamage(damage);
+        if(damage > 0){
+            soundList.add(hurtSound);
+            isHurt = true;
+        }
+    }
 }

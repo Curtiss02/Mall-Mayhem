@@ -13,6 +13,8 @@ public class SecurityGuard extends Enemy {
     private Sprite left;
     private Sprite right;
 
+    private String shootSound = "sounds/shootgun.wav";
+
     public SecurityGuard(int x, int y){
         super(x,y);
         int spriteNum = new Random().nextInt(3) + 1;
@@ -53,6 +55,7 @@ public class SecurityGuard extends Enemy {
 
     public void attack(){
         if(attackTimer == 0) {
+            soundList.add(shootSound);
             double distance = getDistance(x, playerX, y, playerY);
             double xDir = (playerX - x) / distance;
             double yDir = (playerY - y) / distance;

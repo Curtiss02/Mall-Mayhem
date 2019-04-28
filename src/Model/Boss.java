@@ -15,6 +15,7 @@ public class Boss extends Enemy {
 
     private Sprite right;
     private Sprite left;
+    private String shootSound = "sounds/cash.wav";
 
 
     public Boss(int x, int y){
@@ -85,7 +86,7 @@ public class Boss extends Enemy {
     }
 
     public void shoot(){
-
+        soundList.add(shootSound);
         //projectileList.add(new Ball(x,y, 1,1));
         for(int i = 0; i < 360; i+= 10){
             double rads = Math.toRadians(i);
