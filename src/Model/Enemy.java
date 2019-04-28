@@ -10,11 +10,17 @@ import java.util.Random;
 public abstract class Enemy extends Character{
 
     protected int damage;
+
+
     private int invulnTimer = 0;
     protected int invulnTicks = 10;
+
     protected int speed;
     protected boolean isStuck = false;
     protected int stuckCounter = 0;
+
+    // Player position is shared amongst enemies for use
+    // with movement and attack methods
     static double playerX;
     static double playerY;
 

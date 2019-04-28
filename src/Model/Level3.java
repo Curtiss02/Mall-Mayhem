@@ -11,7 +11,7 @@ public class Level3 extends Level{
         super();
         playerStart = new Point(35,13*32);
         playerExit = new Point(19*32, 3*32+5);
-        map = new Map("maps/level3.xml");
+        map = new Map("maps/Level3.xml");
         spawnEnemies();
     }
 

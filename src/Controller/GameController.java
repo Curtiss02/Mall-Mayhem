@@ -6,8 +6,6 @@ import View.*;
 import Model.*;
 
 
-
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -22,8 +20,7 @@ public class GameController {
 
     //Setup game timer, each game tick the game is refreshed and certain logic is calculated
     private Timer gameTimer;
-    //Sets refresh rate, 16ms ~= 60fps
-    private final int TICK_DELAY = 16;
+
     private final int FPS = 60;
     private int UPS = 120;
 
@@ -238,10 +235,36 @@ public class GameController {
     }
     private void checkCollisions(){
 
+
+
+        checkPlayerMapCollisions();
+
+
+
+
+
+
+        checkPlayerPickupCollision();
+
+
+
+
+
+        checkPlayerEnemyCollisions();
+
+
+        checkEnemyLevelCollisions();
+
+
+
+
+        checkProjectileCollisions();
+
+
+    }
+
+    private void checkPlayerMapCollisions(){
         Rectangle playerBound = player.getFutureBounds();
-
-
-
         //Check player and level transition tile collisions
         for(Rectangle thisTile : currentMap.getNextLevelCollision()){
             if(playerBound.intersects(thisTile)){
@@ -255,6 +278,29 @@ public class GameController {
                 break;
             }
         }
+
+        List<Rectangle> levelCollisions = currentMap.getCollisions();
+
+        //Check bounds in x and y direction to figue out which direction the collision occurs to smooth movement
+        Rectangle playerXBounds = player.getFutureBoundsX();
+        Rectangle playerYBounds = player.getFutureBoundsY();
+        //Stop the player from walking through tiles on the collision layer
+        for(int i = 0; i < levelCollisions.size(); i++){
+            Rectangle currentTile = levelCollisions.get(i);
+            if(playerBound.intersects(currentTile)){
+                if(playerXBounds.intersects(currentTile)){
+                    player.stopX();
+                }
+                if(playerYBounds.intersects(currentTile)){
+                    player.stopY();
+                }
+            }
+        }
+    }
+
+    private void checkPlayerPickupCollision(){
+
+        Rectangle playerBound = player.getFutureBounds();
         //Check player-pickup collisions
         Iterator<Pickup> pickupIterator = pickupList.iterator();
         while(pickupIterator.hasNext()){
@@ -264,8 +310,6 @@ public class GameController {
                     case HEALTH:
                         player.addHealth(10);
                         break;
-                    case AMMO:
-                        break;
                     case SUPERSHOT:
                         player.setSuperShot(true);
                         break;
@@ -274,7 +318,10 @@ public class GameController {
 
             }
         }
+    }
 
+    private void checkPlayerEnemyCollisions(){
+        Rectangle playerBound = player.getFutureBounds();
         //If the playe currently has collision disabled, we dont need to check
         if(!player.isInvulnerable()) {
             for (Enemy thisEnemy : enemyList) {
@@ -295,43 +342,11 @@ public class GameController {
                 }
             }
         }
-        //CheckEnemyOnEnemyCollisions();
-        //Check enemy collision against each other
-/*        for(int i = 0; i < enemyList.size(); i++) {
-            if (enemyList.get(i).hasCollision()) {
-                Rectangle firstEnemyBounds = enemyList.get(i).getFutureBounds();
-                for (int j = i + 1; j < enemyList.size(); j++) {
-                    Rectangle secondEnemyBound = enemyList.get(j).getFutureBounds();
-                    if (firstEnemyBounds.intersects(secondEnemyBound)) {
+    }
 
-                        //enemyList.get(i).stop();
-                        break;
-
-                    }
-                }
-            }
-        }*/
-
-        //CheckPlayerLevelCollsions();
+    private void checkEnemyLevelCollisions(){
         List<Rectangle> levelCollisions = currentMap.getCollisions();
 
-        //Check bounds in x and y direction to figue out which direction the collision occurs to smooth movement
-        Rectangle playerXBounds = player.getFutureBoundsX();
-        Rectangle playerYBounds = player.getFutureBoundsY();
-        //Stop the player from walking through tiles on the collision layer
-        for(int i = 0; i < levelCollisions.size(); i++){
-            Rectangle currentTile = levelCollisions.get(i);
-            if(playerBound.intersects(currentTile)){
-                if(playerXBounds.intersects(currentTile)){
-                    player.stopX();
-                }
-                if(playerYBounds.intersects(currentTile)){
-                    player.stopY();
-                }
-            }
-        }
-
-        //Check enemy level collisions
         for(Enemy thisEnemy : enemyList){
             Rectangle enemyBounds = thisEnemy.getFutureBounds();
             Rectangle enemyXBounds = thisEnemy.getFutureBoundsX();
@@ -356,8 +371,11 @@ public class GameController {
                 }
             }
         }
+    }
 
+    private void checkProjectileCollisions(){
         //Check the projectile collisions
+        Rectangle playerBound = player.getFutureBounds();
         for(Projectile thisProjectile : projectileList){
 
             double x = thisProjectile.getX();

@@ -14,9 +14,7 @@ public class Pickup {
     private Rectangle collisionBox;
     public enum TYPE{
         HEALTH,
-        AMMO,
         SUPERSHOT,
-        SUPERSPEED
     }
     private TYPE type;
     public Pickup(int x, int y, TYPE type){
@@ -29,13 +27,10 @@ public class Pickup {
             case HEALTH:
                 sprite.setImage("img/pickups/healthkit.png");
                 break;
-            case AMMO:
-                break;
             case SUPERSHOT:
                 sprite.setImage("img/pickups/supershot.png");
                 break;
-            case SUPERSPEED:
-                break;
+
         }
         width = sprite.getWidth();
         height = sprite.getHeight();

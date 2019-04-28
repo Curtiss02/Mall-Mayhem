@@ -10,15 +10,23 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.zip.DeflaterInputStream;
 
+/* PLAYER CLASS
+
+   The playe class is the user's character
+   and is controlled via keybaord input passed
+   through the GameController
+ */
 public class Player extends Character {
 
     private final int speed = 1;
-    private final int invulnTicks = 120;
+    private final int invulnTicks = 60;
     private final int shootCooldown = 20;
 
     private int shootTimer;
     private int invulnTimer;
 
+
+    //Each of the animations and player states have seperate files
     private String walkUp = "img/player/walk-up.gif";
     private String walkDown = "img/player/walk-down.gif";
     private String walkLeft = "img/player/walk-left.gif";
@@ -54,9 +62,7 @@ public class Player extends Character {
         this.width = sprite.getWidth();
         this.height = sprite.getHeight();
         this.projectileList = new ArrayList<Projectile>();
-        if(healthPoints > 100){
-            healthPoints = 100;
-        }
+
 
         projectileHeight = new Ball(0,0,0,0).getHeight();
         projectileWidth =  new Ball(0,0,0,0).getWidth();
@@ -92,6 +98,9 @@ public class Player extends Character {
     public void stop(){
         dx = 0;
         dy = 0;
+        if(healthPoints > 100){
+            healthPoints = 100;
+        }
         switch (direction) {
 
             case UP:
@@ -200,6 +209,9 @@ public class Player extends Character {
         sprite.setX(x);
         sprite.setY(y);
         //Checks for invulnerbalitlty status
+        if(healthPoints > 100){
+            healthPoints = 100;
+        }
         if(isInvulnerable){
             invulnTimer++;
         }

@@ -64,10 +64,10 @@ public class Map {
         try {
 
             //Read in map data XML file
-            URL url = this.getClass().getClassLoader().getResource(xmlFile);
+            InputStream is = this.getClass().getClassLoader().getResourceAsStream(xmlFile);
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-            Document doc = dBuilder.parse(url.openStream());
+            Document doc = dBuilder.parse(is);
             doc.getDocumentElement().normalize();
 
             Element map = (Element) doc.getElementsByTagName("map").item(0);
