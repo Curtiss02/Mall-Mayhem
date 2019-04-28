@@ -8,9 +8,13 @@ public class GameFrame extends JFrame {
     public GUIPanel myGUIPanel;
     public GameFrame(){
         super("Mall Mayhem");
-        //EventQueue.invokeLater(() -> {
+        EventQueue.invokeLater(() -> {
             myGUIPanel = new GUIPanel();
-        //});
+        });
+
+        //Cheeky thread hack, to avoid null pointer exception
+        long currentTime = System.nanoTime();
+        while(System.nanoTime() < currentTime + 1000000000L);
         start();
 
     }

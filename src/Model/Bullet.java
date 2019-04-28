@@ -2,8 +2,7 @@ package Model;
 
 import View.Sprite;
 
-public class Bullet extends Projectile{
-
+public class Bullet extends Projectile {
     public Bullet(double x, double y, double xDir, double yDir){
         super(x,y,xDir,yDir);
 
@@ -15,7 +14,7 @@ public class Bullet extends Projectile{
 
         sprite = new Sprite(x, y);
 
-        sprite.setImage("img/projectiles/bullet.png");
+        sprite.setImage("src/img/projectiles/bullet.png");
 
         this.width = sprite.getWidth();
         this.height = sprite.getHeight();

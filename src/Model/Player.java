@@ -1,5 +1,8 @@
 package Model;
 
+import Audio.SoundPlayer;
+import View.GUIPanel;
+import View.SettingsMenu;
 import View.Sprite;
 
 import java.awt.*;
@@ -8,34 +11,27 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-import java.util.zip.DeflaterInputStream;
 
-/* PLAYER CLASS
-
-   The playe class is the user's character
-   and is controlled via keybaord input passed
-   through the GameController
- */
 public class Player extends Character {
 
     private final int speed = 1;
-    private final int invulnTicks = 60;
+    private final int invulnTicks = 120;
     private final int shootCooldown = 20;
 
     private int shootTimer;
     private int invulnTimer;
 
-
-    //Each of the animations and player states have seperate files
-    private String walkUp = "img/player/walk-up.gif";
-    private String walkDown = "img/player/walk-down.gif";
-    private String walkLeft = "img/player/walk-left.gif";
-    private String walkRight = "img/player/walk-right.gif";
-    private String stillUp = "img/player/stand-up.png";
-    private String stillDown = "img/player/stand-down.png";
-    private String stillLeft = "img/player/stand-left.png";
-    private String stillRight = "img/player/stand-right.png";
-    private boolean superShot = false;
+    private String walkUp = "src/img/player/walk-up.gif";
+    private String walkDown = "src/img/player/walk-down.gif";
+    private String walkLeft = "src/img/player/walk-left.gif";
+    private String walkRight = "src/img/player/walk-right.gif";
+    private String stillUp = "src/img/player/stand-up.png";
+    private String stillDown = "src/img/player/stand-down.png";
+    private String stillLeft = "src/img/player/stand-left.png";
+    private String stillRight = "src/img/player/stand-right.png";
+    private boolean superShot = true;
+    public static int stamina = 300;
+    SoundPlayer soundPlayer = new SoundPlayer();
 
 
     private enum Direction{
@@ -53,16 +49,14 @@ public class Player extends Character {
 
 
 
-
     public Player(int x, int y){
         this.x = x;
         this.y = y;
         sprite = new Sprite(x,y);
-        setSprite("img/player/stand-right.png");
+        setSprite("src/img/player/stand-right.png");
         this.width = sprite.getWidth();
         this.height = sprite.getHeight();
         this.projectileList = new ArrayList<Projectile>();
-
 
         projectileHeight = new Ball(0,0,0,0).getHeight();
         projectileWidth =  new Ball(0,0,0,0).getWidth();
@@ -71,7 +65,7 @@ public class Player extends Character {
         this.yDirection = 0;
         this.xDirection = 1;
         this.direction = Direction.RIGHT;
-        this.healthPoints = 100;
+        this.healthPoints = 90;
         this.shootTimer = 0;
 
 
@@ -98,9 +92,6 @@ public class Player extends Character {
     public void stop(){
         dx = 0;
         dy = 0;
-        if(healthPoints > 100){
-            healthPoints = 100;
-        }
         switch (direction) {
 
             case UP:
@@ -128,7 +119,7 @@ public class Player extends Character {
                 sprite.setImage(stillRight);
                 break;
         }
-        }
+    }
     public void reverse(){
         dx = -dx;
         dy = -dy;
@@ -178,8 +169,11 @@ public class Player extends Character {
     }
 
     public void sprint(){
-        dx *= 2;
-        dy *= 2;
+        if(stamina > 1) {
+            dx *= 2;
+            dy *= 2;
+            stamina -= 3;
+        }
     }
 
 
@@ -195,6 +189,9 @@ public class Player extends Character {
             else {
 
                 projectileList.add(new Ball(x+projectileXOffset, y+projectileYOffset, xDirection, yDirection));
+                if(SettingsMenu.soundOn == 1) {
+                    soundPlayer.playSound("C:\\Users\\josha\\IdeaProjects\\2019-Java-Group42\\src\\Audio\\click_x.wav");
+                }
             }
 
             shootTimer++;
@@ -209,9 +206,6 @@ public class Player extends Character {
         sprite.setX(x);
         sprite.setY(y);
         //Checks for invulnerbalitlty status
-        if(healthPoints > 100){
-            healthPoints = 100;
-        }
         if(isInvulnerable){
             invulnTimer++;
         }
@@ -301,9 +295,17 @@ public class Player extends Character {
         }
     }
 
-    public void setSuperShot(boolean superShot) {
-        this.superShot = superShot;
+
+    public Rectangle getFutureBoundsY(){
+        return new Rectangle((int)(x), (int)(y + dy), width, height);
     }
-
-
+    public Rectangle getFutureBoundsX(){
+        return new Rectangle((int)(x+dx), (int)(y), width, height);
+    }
+    public void stopY(){
+        dy = 0;
+    }
+    public void stopX(){
+        dx = 0;
+    }
 }

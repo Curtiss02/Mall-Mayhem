@@ -1,9 +1,11 @@
 package Controller;
 
 
+import Audio.SoundPlayer;
 import Model.Character;
 import View.*;
 import Model.*;
+import org.w3c.dom.css.Rect;
 
 
 import javax.swing.*;
@@ -20,7 +22,8 @@ public class GameController {
 
     //Setup game timer, each game tick the game is refreshed and certain logic is calculated
     private Timer gameTimer;
-
+    //Sets refresh rate, 16ms ~= 60fps
+    private final int TICK_DELAY = 16;
     private final int FPS = 60;
     private int UPS = 120;
 
@@ -31,8 +34,6 @@ public class GameController {
 
     //Must load the view into the controller
     private GUIPanel view;
-
-    private int score = 0;
 
 
 
@@ -55,6 +56,8 @@ public class GameController {
     private boolean isPaused = false;
 
     public GameController() {}
+
+    SoundPlayer soundPlayer = new SoundPlayer();
 
     public void setView(GUIPanel view) {
         this.view = view;
@@ -109,7 +112,6 @@ public class GameController {
                 frames = 0;
                 ticks = 0;
                 timer += 1000;
-
             }
         }
     }
@@ -123,12 +125,9 @@ public class GameController {
 
 
         spriteList = new ArrayList<Sprite>();
-        new Shopper(1,1);
         levelList = new ArrayList<>();
         levelList.add(new StartLevel());
         levelList.add(new Level2());
-        levelList.add(new Level3());
-        levelList.add(new BossLevel());
 
 
         levelIndex = 0;
@@ -151,8 +150,6 @@ public class GameController {
     private void update(){
         projectileList = Character.getProjectileList();
 
-        levelSpecificChecks();
-
         moveEnemies();
 
         moveProjectiles();
@@ -160,10 +157,6 @@ public class GameController {
         checkCollisions();
 
         player.tick();
-
-        if(player.getHealthPoints() <= 0){
-            gameOver();
-        }
 
         tickEnemies();
 
@@ -174,10 +167,6 @@ public class GameController {
         updateSprites();
 
         updateGUI();
-
-        if(endGameTimer > 1200){
-            System.exit(0);
-        }
 
     }
 
@@ -235,36 +224,10 @@ public class GameController {
     }
     private void checkCollisions(){
 
-
-
-        checkPlayerMapCollisions();
-
-
-
-
-
-
-        checkPlayerPickupCollision();
-
-
-
-
-
-        checkPlayerEnemyCollisions();
-
-
-        checkEnemyLevelCollisions();
-
-
-
-
-        checkProjectileCollisions();
-
-
-    }
-
-    private void checkPlayerMapCollisions(){
         Rectangle playerBound = player.getFutureBounds();
+
+
+
         //Check player and level transition tile collisions
         for(Rectangle thisTile : currentMap.getNextLevelCollision()){
             if(playerBound.intersects(thisTile)){
@@ -272,13 +235,64 @@ public class GameController {
                 break;
             }
         }
-        for(Rectangle thisTile : currentMap.getPrevLevelCollisions()){
-            if(playerBound.intersects(thisTile)){
-                prevLevel();
-                break;
+        //Check player-pickup collisions
+        Iterator<Pickup> pickupIterator = pickupList.iterator();
+        while(pickupIterator.hasNext()){
+            Pickup thisPickup = pickupIterator.next();
+            if(playerBound.intersects(thisPickup.getCollisionBox())){
+                switch (thisPickup.getType()){
+                    case HEALTH:
+                        player.addHealth(10);
+                        break;
+                    case AMMO:
+                        break;
+                    case SUPERSHOT:
+                        break;
+                    case SUPERSPEED:
+                        break;
+                }
+                pickupIterator.remove();
+
             }
         }
 
+        //If the playe currently has collision disabled, we dont need to check
+        if(!player.isInvulnerable()) {
+            for (Enemy thisEnemy : enemyList) {
+                Rectangle enemyBound = thisEnemy.getFutureBounds();
+                if (playerBound.intersects(enemyBound)) {
+
+                    //Should probably not stop player in event of enemy collision, just take damage + invuln for small time
+                    //Temporary just for now
+                    player.takeDamage(thisEnemy.getDamage());
+                    //int xDir = (player.getX() - thisEnemy.getX()) / Math.abs(player.getX() - thisEnemy.getX());
+                    //int yDir = (player.getY() - thisEnemy.getY()) / Math.abs(player.getY() - thisEnemy.getY());
+
+                    //player.knockBack(xDir, yDir, 20);
+
+                    player.setInvulnerable(true);
+                    break;
+                }
+            }
+        }
+        //CheckEnemyOnEnemyCollisions();
+        //Check enemy collision against each other
+/*        for(int i = 0; i < enemyList.size(); i++) {
+            if (enemyList.get(i).hasCollision()) {
+                Rectangle firstEnemyBounds = enemyList.get(i).getFutureBounds();
+                for (int j = i + 1; j < enemyList.size(); j++) {
+                    Rectangle secondEnemyBound = enemyList.get(j).getFutureBounds();
+                    if (firstEnemyBounds.intersects(secondEnemyBound)) {
+
+                        //enemyList.get(i).stop();
+                        break;
+
+                    }
+                }
+            }
+        }*/
+
+        //CheckPlayerLevelCollsions();
         List<Rectangle> levelCollisions = currentMap.getCollisions();
 
         //Check bounds in x and y direction to figue out which direction the collision occurs to smooth movement
@@ -296,71 +310,16 @@ public class GameController {
                 }
             }
         }
-    }
 
-    private void checkPlayerPickupCollision(){
-
-        Rectangle playerBound = player.getFutureBounds();
-        //Check player-pickup collisions
-        Iterator<Pickup> pickupIterator = pickupList.iterator();
-        while(pickupIterator.hasNext()){
-            Pickup thisPickup = pickupIterator.next();
-            if(playerBound.intersects(thisPickup.getCollisionBox())){
-                switch (thisPickup.getType()){
-                    case HEALTH:
-                        player.addHealth(10);
-                        break;
-                    case SUPERSHOT:
-                        player.setSuperShot(true);
-                        break;
-                }
-                pickupIterator.remove();
-
-            }
-        }
-    }
-
-    private void checkPlayerEnemyCollisions(){
-        Rectangle playerBound = player.getFutureBounds();
-        //If the playe currently has collision disabled, we dont need to check
-        if(!player.isInvulnerable()) {
-            for (Enemy thisEnemy : enemyList) {
-                Rectangle enemyBound = thisEnemy.getFutureBounds();
-                if (playerBound.intersects(enemyBound)) {
-
-                    //Should probably not stop player in event of enemy collision, just take damage + invuln for small time
-                    //Temporary just for now
-                    player.takeDamage(thisEnemy.getDamage());
-                    score -= thisEnemy.getDamage();
-                    //int xDir = (player.getX() - thisEnemy.getX()) / Math.abs(player.getX() - thisEnemy.getX());
-                    //int yDir = (player.getY() - thisEnemy.getY()) / Math.abs(player.getY() - thisEnemy.getY());
-
-                    //player.knockBack(xDir, yDir, 20);
-
-                    player.setInvulnerable(true);
-                    break;
-                }
-            }
-        }
-    }
-
-    private void checkEnemyLevelCollisions(){
-        List<Rectangle> levelCollisions = currentMap.getCollisions();
-
+        //Check enemy level collisions
         for(Enemy thisEnemy : enemyList){
             Rectangle enemyBounds = thisEnemy.getFutureBounds();
-            Rectangle enemyXBounds = thisEnemy.getFutureBoundsX();
-            Rectangle enemyYBounds = thisEnemy.getFutureBoundsY();
             for(Rectangle currentTile : levelCollisions){
-                if(enemyBounds.intersects(currentTile)) {
-                    if (enemyXBounds.intersects(currentTile)) {
-                        thisEnemy.stopX();
+                if(enemyBounds.intersects(currentTile)){
+                    thisEnemy.stop();
 
-                    }
-                    if (enemyYBounds.intersects(currentTile)) {
-                        thisEnemy.stopY();
-                    }
                     thisEnemy.setStuck(true);
+
                     break;
 
                 }
@@ -371,11 +330,8 @@ public class GameController {
                 }
             }
         }
-    }
 
-    private void checkProjectileCollisions(){
         //Check the projectile collisions
-        Rectangle playerBound = player.getFutureBounds();
         for(Projectile thisProjectile : projectileList){
 
             double x = thisProjectile.getX();
@@ -384,7 +340,7 @@ public class GameController {
             int height = thisProjectile.getHeight();
             Rectangle projectileBounds = thisProjectile.getBounds();
             if(isOffScreen((int)x, (int)y, width, height)){
-
+                System.out.println("OFF");
                 thisProjectile.takeDamage(99);
             }
 
@@ -395,7 +351,6 @@ public class GameController {
                     if(projectileBounds.intersects(enemyBounds)){
                         if(thisEnemy.isInvulnerable() == false){
                             thisEnemy.takeDamage(thisProjectile.getDamage());
-                            score += thisEnemy.getDamage()*2;
                         }
                         thisProjectile.takeDamage(99);
                         break;
@@ -417,8 +372,6 @@ public class GameController {
     }
 
     private void moveEnemies(){
-        Enemy.setPlayerX(player.getX());
-        Enemy.setPlayerY(player.getY());
         for(Enemy thisEnemy : enemyList){
             thisEnemy.stop();
             thisEnemy.move();
@@ -480,8 +433,8 @@ public class GameController {
             if (keyPresses[KeyEvent.VK_SPACE]) {
                 player.shoot();
             }
-            if (keyPresses[KeyEvent.VK_PAGE_DOWN]){
-                skipToEnd();
+            if (keyPresses[KeyEvent.VK_ESCAPE]) {
+                GUIPanel.State = GUIPanel.STATE.QUIT;
             }
         }
 
@@ -508,22 +461,8 @@ public class GameController {
 
 
     private void nextLevel(){
-
+        System.out.println("NEXT LEVEL!");
         levelIndex++;
-        updateonLevelChange();
-    }
-    private void prevLevel(){
-        levelIndex--;
-        updateonLevelChange();
-        player.setX(currentLevel.getPlayerExit().x);
-        player.setY(currentLevel.getPlayerExit().y);
-
-    }
-    private void setLevel(int level, boolean isExit){
-        levelIndex = level;
-        updateonLevelChange();
-    }
-    private void updateonLevelChange(){
         currentLevel = levelList.get(levelIndex);
         currentMap = currentLevel.getMap();
         enemyList = currentLevel.getEnemyList();
@@ -534,58 +473,4 @@ public class GameController {
         view.setCurrentMap(currentMap);
     }
 
-    private boolean level3Flag = false;
-
-    private void levelSpecificChecks(){
-        if(levelIndex == 2){
-            if (!level3Flag && enemyList.isEmpty()){
-                pickupList.add(new Pickup(600,600, Pickup.TYPE.SUPERSHOT));
-                level3Flag = true;
-            }
-        }
-        if(levelIndex == 3){
-            if(enemyList.isEmpty()) {
-                scoreScreen();
-
-
-            }
-
-        }
-    }
-
-    private boolean skipFlag = false;
-
-    private void skipToEnd(){
-        if(!skipFlag) {
-            levelIndex = 3;
-            player.setSuperShot(true);
-            player.addHealth(100);
-            updateonLevelChange();
-            skipFlag = true;
-        }
-
-    }
-
-    private int endGameTimer = 0;
-    private void scoreScreen(){
-
-        view.setScore(score);
-        view.enableScoreScreen();
-        endGameTimer++;
-
-    }
-
-    private void gameOver(){
-        view.setGameOver(true);
-        player.setY(99999);
-        player.setX(99999);
-        player.getSprite().setVisible(false);
-        endGameTimer++;
-    }
-
-
-
-
-
 }
-

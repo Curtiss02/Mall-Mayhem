@@ -9,7 +9,7 @@ public class NPC_Shopper extends Enemy {
         super(x,y);
         isInvulnerable = true;
         int spritenum = new Random().nextInt(4) + 1;
-        String spriteSrc = "img/enemies/shopper" + String.valueOf(spritenum) + ".png";
+        String spriteSrc = "src/img/enemies/shopper" + String.valueOf(spritenum) + ".png";
         sprite.setImage(spriteSrc);
         width = sprite.getWidth();
         height = sprite.getHeight();
@@ -19,9 +19,9 @@ public class NPC_Shopper extends Enemy {
     }
 
     public void move(){
-            stop();
+        stop();
 
-            meander();
+        meander();
 
     }
 
@@ -44,6 +44,4 @@ public class NPC_Shopper extends Enemy {
         }
 
     }
-
-
 }

@@ -1,26 +1,21 @@
 package Model;
 
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.Random;
 
 public class StartLevel extends Level {
-
     public StartLevel(){
 
         super();
         playerStart = new Point(300,300);
-        playerExit = new Point(23*32, 64);
-        map = new Map("maps/intro.xml");
+        map = new Map("src/maps/intro.xml");
 
-        Pickup healthKit = new Pickup( 1000, 300, Pickup.TYPE.HEALTH);
+        Pickup healthKit = new Pickup( 300, 300, Pickup.TYPE.HEALTH);
         pickupList.add(healthKit);
 
 
 
         //Add to list of sprites being drawn
-
-
         SpawnNPCs();
 
     }

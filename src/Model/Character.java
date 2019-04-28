@@ -1,9 +1,11 @@
 package Model;
+import Audio.SoundPlayer;
+import View.SettingsMenu;
 import View.Sprite;
 
 import java.awt.*;
+import java.nio.channels.SeekableByteChannel;
 import java.util.ArrayList;
-import java.util.List;
 
 public abstract class Character {
     protected double y;
@@ -14,8 +16,9 @@ public abstract class Character {
     protected boolean hasCollision = true;
     protected boolean isInvulnerable = false;
     protected Sprite sprite;
+    SoundPlayer soundPlayer = new SoundPlayer();
 
-    static List<Projectile> projectileList = new ArrayList<Projectile>();
+    static ArrayList<Projectile> projectileList = new ArrayList<Projectile>();
 
     double xDirection;
     double yDirection;
@@ -95,21 +98,7 @@ public abstract class Character {
         this.healthPoints += health;
     }
 
-    public static List<Projectile> getProjectileList() {
+    public static ArrayList<Projectile> getProjectileList() {
         return projectileList;
     }
-    public Rectangle getFutureBoundsY(){
-        return new Rectangle((int)(x), (int)(y + dy), width, height);
-    }
-    public Rectangle getFutureBoundsX(){
-        return new Rectangle((int)(x+dx), (int)(y), width, height);
-    }
-    public void stopY(){
-        dy = 0;
-    }
-
-    public void stopX(){
-        dx = 0;
-    }
-
 }

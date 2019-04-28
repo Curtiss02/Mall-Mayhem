@@ -10,17 +10,11 @@ import java.util.Random;
 public abstract class Enemy extends Character{
 
     protected int damage;
-
-
     private int invulnTimer = 0;
     protected int invulnTicks = 10;
-
     protected int speed;
     protected boolean isStuck = false;
     protected int stuckCounter = 0;
-
-    // Player position is shared amongst enemies for use
-    // with movement and attack methods
     static double playerX;
     static double playerY;
 
@@ -107,16 +101,15 @@ public abstract class Enemy extends Character{
         }
 
         x += dx;
-
         y += dy;
-        sprite.setY((int) y);
-        sprite.setX((int) x);
+
+        this.sprite.setY((int)y);
+        this.sprite.setX((int)x);
     }
 
     public void setStuck(boolean stuck) {
         isStuck = stuck;
     }
-
 
     protected List<Point> patrolPoints;
     protected int pointIndex;
@@ -221,11 +214,12 @@ public abstract class Enemy extends Character{
         //Check if we have reached the current destination
         if((this.x == currentDestination.x) && (this.y == currentDestination.y)){
             getNewMeanderPoint();
-
+            //System.out.println("REACDHED DEST");
             isWaiting = true;
             Random random = new Random();
             waitValue = random.nextInt(maxWait - minWait) + minWait;
 
+            //System.out.println("Wait value: " + waitValue);
 
         }
 

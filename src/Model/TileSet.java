@@ -4,7 +4,6 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 
 public class TileSet {
     private int imageWidth;
@@ -44,8 +43,7 @@ public class TileSet {
     private void loadImage(){
 
         try {
-            URL url = this.getClass().getClassLoader().getResource("maps/" + imageSrc);
-            tilesetImage = ImageIO.read(url);
+            tilesetImage = ImageIO.read(new File("src/maps/" + imageSrc));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -56,14 +54,14 @@ public class TileSet {
         //System.out.printf("WIDTH: %d HEIGHT: %d GID: %d WIDTH IN TILES: %d\n", imageWidth, imageHeight, GID, widthInTiles);
 
         int yPos = (int)(Math.ceil((double)GID/widthInTiles)-1);
-
+        System.out.println(yPos);
 
         int xPos = GID - (widthInTiles*yPos) - 1;
 
         xPos *= tileWidth;
         yPos *= tileWidth;
 
-
+        System.out.printf("Tile Width:%d X:%d Y:%d GID:%d Accessig file: %s\n",tileWidth, xPos, yPos, GID, imageSrc);
 
 
         BufferedImage tile = tilesetImage.getSubimage(xPos, yPos, tileWidth, tileHeight);

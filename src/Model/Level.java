@@ -5,12 +5,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class Level {
-
     protected Map map;
     protected List<Enemy> enemyList;
     protected List<Pickup> pickupList;
     protected Point playerStart;
-    protected Point playerExit;
 
     public Level(){
         enemyList = new ArrayList<Enemy>();
@@ -18,7 +16,7 @@ public abstract class Level {
 
     }
 
-    public Map getMap() {
+    public Model.Map getMap() {
         return map;
     }
 
@@ -34,7 +32,7 @@ public abstract class Level {
         return playerStart;
     }
 
-    public Point getPlayerExit() {
-        return playerExit;
-    }
 }
+
+
+

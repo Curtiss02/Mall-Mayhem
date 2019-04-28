@@ -3,7 +3,6 @@ package Model;
 import View.Sprite;
 
 public class CashBullet extends Projectile {
-
     public CashBullet(double x, double y, double xDir, double yDir){
         super(x,y,xDir,yDir);
 
@@ -15,7 +14,7 @@ public class CashBullet extends Projectile {
 
         sprite = new Sprite(x, y);
 
-        sprite.setImage("img/projectiles/cash.png");
+        sprite.setImage("src/img/projectiles/cash.png");
 
         this.width = sprite.getWidth();
         this.height = sprite.getHeight();
