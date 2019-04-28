@@ -8,7 +8,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-
+/*
+    The sprite class is used by every character and simply contains and image with some coordinates
+ */
 public class Sprite {
     //
     private int x, y;

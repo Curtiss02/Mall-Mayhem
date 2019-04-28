@@ -15,7 +15,8 @@ public class Level2 extends Level {
         playerStart = new Point(23*32,27*32);
         playerExit = new Point(43*32,10*32);
         map = new Map("maps/Level2.xml");
-
+        Pickup healthKit = new Pickup( 42*32, 10*32, Pickup.TYPE.HEALTH);
+        pickupList.add(healthKit);
         spawnEnemies();
     }
 

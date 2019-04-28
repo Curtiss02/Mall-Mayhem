@@ -3,7 +3,9 @@ package Model;
 import View.Sprite;
 
 import java.util.Random;
-
+/*
+    Securtiy guard patrols and shoots at player
+ */
 public class SecurityGuard extends Enemy {
 
     private int attackTimer = 0;

@@ -3,7 +3,10 @@ package Model;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
-
+/*
+    The level class contains all non playr data in each level
+    including pikcups, enemies and the map data
+ */
 public abstract class Level {
 
     protected Map map;

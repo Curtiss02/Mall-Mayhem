@@ -2,6 +2,9 @@ package Model;
 
 import java.awt.*;
 import java.util.Random;
+/*
+    The harmless NPC from the first level of the game
+ */
 
 public class NPC_Shopper extends Enemy {
 

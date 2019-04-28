@@ -5,6 +5,10 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import java.net.URL;
 
+/* Music playe class plays the games background music
+    Tha main difference from the SoundPLayer class is that the file loops,
+    and we have the ability to pause and resume the song
+ */
 
 public class MusicPlayer {
 

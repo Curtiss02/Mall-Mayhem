@@ -55,6 +55,7 @@ public class GameController {
 
 
     private List<Level> levelList;
+    // Keep track of current level
     private int levelIndex;
     private Level currentLevel;
 
@@ -76,7 +77,18 @@ public class GameController {
     }
 
 
+    /* This game loop works off on delta time , meaning that if for any reason a a game update takes longer than the allowed time,
+       the game will pump out ticks until it catches back up to where it is supposed to be, and thus avoids slowing down the game
 
+       The basic update loop goes
+       - Get User Input
+       - Determine Actions
+       - Check Validity of Actions
+       - Apply Actions to Objects
+       - Update GUI
+
+
+     */
     private void gameLoop() {
 
         long startTime = System.nanoTime();
@@ -135,21 +147,26 @@ public class GameController {
 
 
     private void init(){
-        //Create a new player
+
 
         musicPlayer.playMusic("sounds/mallmusic.wav");
+
         spriteList = new ArrayList<>();
+
         levelList = new ArrayList<>();
         levelList.add(new StartLevel());
         levelList.add(new Level2());
         levelList.add(new Level3());
         levelList.add(new BossLevel());
-
-        musicPlayer = new MusicPlayer();
         levelIndex = 0;
         currentLevel = levelList.get(levelIndex);
+
+        musicPlayer = new MusicPlayer();
+
         enemyList = currentLevel.getEnemyList();
+
         player = new Player(currentLevel.getPlayerStart().x,currentLevel.getPlayerStart().y);
+
         pickupList = currentLevel.getPickupList();
         currentMap = currentLevel.getMap();
 
@@ -163,7 +180,9 @@ public class GameController {
 
 
 
-    // Will evetually include function which will tick() trough every currentl used entity
+    //  Move -> Validate -> Confirm/Update(Tick)
+
+    //
     private void update(){
 
 
@@ -205,6 +224,8 @@ public class GameController {
 
     }
 
+
+    // Remove dead enemies
     private void cleanupEnemies(){
         Iterator<Enemy> enemyIterator = enemyList.iterator();
         while(enemyIterator.hasNext()){
@@ -217,6 +238,8 @@ public class GameController {
         }
 
     }
+
+    // Get and display sprites from every character on screen
     private void updateSprites(){
         spriteList.clear();
         updateProjectileSprites();
@@ -224,6 +247,8 @@ public class GameController {
         updatePickupSprites();
         spriteList.add(player.getSprite());
     }
+
+
 
     void tickProjectiles(){
         for(Projectile thisProjectile : projectileList){
@@ -257,36 +282,23 @@ public class GameController {
             thisProjectile.move();
         }
     }
+
+
     private void checkCollisions(){
 
         checkProjectileCollisions();
 
         checkPlayerMapCollisions();
 
-
-
-
-
-
         checkPlayerPickupCollision();
-
-
-
-
 
         checkPlayerEnemyCollisions();
 
-
         checkEnemyLevelCollisions();
-
-
-
-
-
-
-
     }
 
+
+    // Prevents player froming walking through world objects, as well as transitioning between levels
     private void checkPlayerMapCollisions(){
         Rectangle playerBound = player.getFutureBounds();
         //Check player and level transition tile collisions
@@ -322,6 +334,7 @@ public class GameController {
         }
     }
 
+
     private void checkPlayerPickupCollision(){
 
         Rectangle playerBound = player.getFutureBounds();
@@ -343,6 +356,7 @@ public class GameController {
             }
         }
     }
+
 
     private void checkPlayerEnemyCollisions(){
         Rectangle playerBound = player.getFutureBounds();
@@ -368,6 +382,7 @@ public class GameController {
         }
     }
 
+    // Stop enemies from walking through walls
     private void checkEnemyLevelCollisions(){
         List<Rectangle> levelCollisions = currentMap.getCollisions();
 
@@ -426,7 +441,7 @@ public class GameController {
                     }
                 }
             }
-            //Checks agains the player if the projectile belongs to the enemy
+            //Checks against the player if the projectile belongs to the enemy
             if(thisProjectile.isEnemy()){
 
                 if(projectileBounds.intersects(playerBound)){
@@ -441,6 +456,7 @@ public class GameController {
         }
     }
 
+
     private void moveEnemies(){
         Enemy.setPlayerX(player.getX());
         Enemy.setPlayerY(player.getY());
@@ -450,7 +466,7 @@ public class GameController {
         }
     }
 
-    //Updates enemy coords after verifying collision
+    //Updates enemy after verifying collisions
     private void tickEnemies(){
 
         for (Enemy thisEnemy  : enemyList) {
@@ -459,9 +475,11 @@ public class GameController {
 
     }
 
-
+    //Needed to keep track of key presses for toggle
     private boolean pausePressed;
     private int pauseReleased = 0;
+
+    // Gets all user input via a shared array with GUIPanel
     private void getInput(){
 
         //Contains information on current status of keyboard input
@@ -519,6 +537,7 @@ public class GameController {
 
     }
 
+    //Play all sounds added to list
     private void playSounds(){
         List<String> soundList = Character.getSoundList();
         for(String s : soundList){
@@ -527,6 +546,9 @@ public class GameController {
         soundList.clear();
     }
 
+
+     //Checks for offscreen object
+    // Used for projectiles to prevent slowdown and reduce memory usage
     private boolean isOffScreen(int x, int y, int width, int height){
         int screenWidth = view.getWidth();
         int screenHeight = view.getHeight();
@@ -536,6 +558,8 @@ public class GameController {
         return false;
 
     }
+
+    //Providesa any needed information for the GUI
     private void updateGUI(){
         view.setPlayerHealth(player.getHealthPoints());
     }
@@ -544,12 +568,14 @@ public class GameController {
 
 
 
-
+    // Advances to the next game level, and changes any needed variables
     private void nextLevel(){
 
         levelIndex++;
         updateonLevelChange();
     }
+
+    //Returns to the previous level
     private void prevLevel(){
         levelIndex--;
         updateonLevelChange();
@@ -561,6 +587,8 @@ public class GameController {
         levelIndex = level;
         updateonLevelChange();
     }
+
+    //Performs all neccesary function on level change
     private void updateonLevelChange(){
         currentLevel = levelList.get(levelIndex);
         currentMap = currentLevel.getMap();
@@ -592,6 +620,8 @@ public class GameController {
 
     private boolean skipFlag = false;
 
+
+    // For debugging/requirements
     private void skipToEnd(){
         if(!skipFlag) {
             levelIndex = 3;
@@ -620,6 +650,7 @@ public class GameController {
     private void gameWon(){
         if(!gameoverdoneOnce) {
             globalTimer = -1;
+            player.isInvulnerable();
             finalScore = (int) (score * (5 + (0.00F * globalTimer)));
             HighScoreMenu.addHighScore(finalScore);
             view.setGameWon(true);

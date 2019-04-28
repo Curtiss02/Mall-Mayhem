@@ -6,7 +6,11 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-
+/*
+    The enmy is are the enemies of the gamme
+    Adversaries of the player, they aim to kill you
+    This is merely an abstract base class, and thus must be implemented to be instantiated
+ */
 public abstract class Enemy extends Character{
 
     protected int damage;
@@ -66,6 +70,8 @@ public abstract class Enemy extends Character{
             direction = Direction.UP;
         }
     }
+
+
     public void moveDown(){
         dy = speed;
         if(direction == Direction.LEFT){
@@ -199,6 +205,7 @@ public abstract class Enemy extends Character{
 
 
     //Behaviour for aimless wandering
+
     protected final int minWait = 120;
     protected final int maxWait = 500;
     protected final int minWander = 30;
@@ -209,6 +216,10 @@ public abstract class Enemy extends Character{
     protected int waitValue;
     protected boolean isWaiting = false;
     protected Point currentDestination;
+
+
+
+    //Makes the Enemy randomyl wander about
 
     protected void meander(){
         if(currentDestination == null){
@@ -308,7 +319,7 @@ public abstract class Enemy extends Character{
         Enemy.playerY = playerY;
     }
 
-
+    //Makes the enemy swarm towards the player
     public void swarm(double targetX, double targetY){
         double distance = getDistance(x,targetX,y,targetY);
         double xScale = (targetX - x)/distance;

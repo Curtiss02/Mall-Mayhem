@@ -25,7 +25,7 @@ public class MouseInput implements MouseListener {
     public Rectangle settingsbutton = new Rectangle(650, 450, 300, 75);
     public Rectangle quitbutton = new Rectangle(650, 600, 300, 75);*/
 
-
+// Locations of menu buttons to determine when to change menu state
         if(mx >= 650 && mx <= 950 && GUIPanel.State == GUIPanel.STATE.MENU){
             //Play Button
             if(my >= 150 && my <= 225) {

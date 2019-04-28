@@ -12,7 +12,14 @@ import java.util.List;
 
 import org.w3c.dom.*;
 
-
+/*
+    The map class is used to hold both visual data as well as important game data for each level.
+    The maps are created in a level editor program called "Tiled", and exported as XML files.
+    The map class parses these XML files and puts the data into a form that is useable in Java.
+    The images for each of the different map layers is then created, and drawn on top one another.
+    Collision data is also stored in specific layers, is passed through to the game controllr via the level class
+    This allows for the easy creation and addition of new levels
+ */
 
 public class Map {
 
@@ -67,6 +74,8 @@ public class Map {
 
             Element map = (Element) doc.getElementsByTagName("map").item(0);
 
+
+            //Grab map attributes
             tileWidth = Integer.valueOf(map.getAttribute("tilewidth"));
             mapWidth = Integer.valueOf(map.getAttribute("width"));
             mapHeight = Integer.valueOf(map.getAttribute("height"));
@@ -76,7 +85,7 @@ public class Map {
             NodeList tilesetNodes = doc.getElementsByTagName("tileset");
             tilesets = new ArrayList<TileSet>();
 
-
+            //Creates a tileset object for each tileset used in the map
             for (int i = 0; i < tilesetNodes.getLength(); i++) {
 
                 Node tempNode = tilesetNodes.item(0);
@@ -106,6 +115,7 @@ public class Map {
 
             NodeList layers = map.getElementsByTagName("layer");
 
+            // Goes through each layer in the map, grabbing the needed information in each
             for (int i = 0; i < layers.getLength(); i++) {
                 Element currentLayer = (Element) layers.item(i);
                 String layerName = currentLayer.getAttribute("name");
@@ -144,7 +154,7 @@ public class Map {
 
                 }
 
-                //Draw the fucking image please god i hope this works or im gonna cry
+                // Draws the image using the now parsed tile data as well as the tileset image data
 
                 Graphics gIMG = currentImage.getGraphics();
                 for (int tileX = 0; tileX < mapWidth; tileX++) {
@@ -172,7 +182,7 @@ public class Map {
 
                     }
                 }
-
+                // Decides what to do with the data based upon the layer type
                 switch (layerName) {
                     case "Background":
                         backgroundLayers.add(currentImage);
@@ -215,6 +225,8 @@ public class Map {
     private void buildLayer(BufferedImage layerImage, int[][] layerData){
 
     }
+
+
 
     private void createCollisionData(List<Rectangle> collisionList, int[][] tileData){
 

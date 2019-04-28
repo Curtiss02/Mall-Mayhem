@@ -13,7 +13,7 @@ public class StartLevel extends Level {
         playerExit = new Point(23*32, 64);
         map = new Map("maps/intro.xml");
 
-        Pickup healthKit = new Pickup( 1000, 300, Pickup.TYPE.HEALTH);
+        Pickup healthKit = new Pickup( 37*32, 10*32, Pickup.TYPE.HEALTH);
         pickupList.add(healthKit);
 
 

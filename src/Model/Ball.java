@@ -5,7 +5,7 @@ import View.Sprite;
 public class Ball extends Projectile {
 
 
-
+    //Ball projectile for player attack
 
     public Ball(double x, double y, double xDir, double yDir){
 

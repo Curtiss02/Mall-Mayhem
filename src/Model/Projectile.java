@@ -1,6 +1,13 @@
 package Model;
 
-import View.Sprite;
+
+/*
+        The Projectile class is the main form of attack in th game
+        Projectile can be fired by enemies and the players.
+        Does damage on impact and is destroyed upon collision with characters
+
+
+ */
 
 public abstract class Projectile extends Character {
 

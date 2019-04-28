@@ -12,6 +12,11 @@ public class Level3 extends Level{
         playerStart = new Point(35,13*32);
         playerExit = new Point(19*32, 3*32+5);
         map = new Map("maps/Level3.xml");
+
+
+        pickupList.add( new Pickup(10*32, 23*32, Pickup.TYPE.HEALTH));
+        pickupList.add( new Pickup(39*32, 23*32, Pickup.TYPE.HEALTH));
+
         spawnEnemies();
     }
 

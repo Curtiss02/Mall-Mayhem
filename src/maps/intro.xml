@@ -30,6 +30,9 @@
  <tileset firstgid="2545" name="MegaPixelArt32x32pxIcons_SpriteSheet" tilewidth="32" tileheight="32" tilecount="504" columns="14">
   <image source="tilesets/MegaPixelArt32x32pxIcons_SpriteSheet.png" width="448" height="1152"/>
  </tileset>
+ <tileset firstgid="3049" name="tutorial" tilewidth="32" tileheight="32" tilecount="100" columns="10">
+  <image source="tilesets/tutorial.png" width="320" height="320"/>
+ </tileset>
  <layer id="1" name="NextLevel" width="45" height="29">
   <data>
    <tile/>
@@ -8323,6 +8326,11 @@
    <tile/>
    <tile/>
    <tile/>
+   <tile gid="3101"/>
+   <tile gid="3102"/>
+   <tile gid="3103"/>
+   <tile gid="3104"/>
+   <tile gid="3105"/>
    <tile/>
    <tile/>
    <tile/>
@@ -8331,6 +8339,7 @@
    <tile/>
    <tile/>
    <tile/>
+   <tile gid="3053"/>
    <tile/>
    <tile/>
    <tile/>
@@ -8362,6 +8371,11 @@
    <tile/>
    <tile/>
    <tile/>
+   <tile gid="3111"/>
+   <tile gid="3112"/>
+   <tile gid="3113"/>
+   <tile gid="3114"/>
+   <tile gid="3115"/>
    <tile/>
    <tile/>
    <tile/>
@@ -8370,6 +8384,7 @@
    <tile/>
    <tile/>
    <tile/>
+   <tile gid="3063"/>
    <tile/>
    <tile/>
    <tile/>
@@ -8414,6 +8429,7 @@
    <tile/>
    <tile/>
    <tile/>
+   <tile gid="3073"/>
    <tile/>
    <tile/>
    <tile/>
@@ -8929,6 +8945,11 @@
    <tile/>
    <tile/>
    <tile/>
+   <tile gid="3129"/>
+   <tile gid="3130"/>
+   <tile gid="3131"/>
+   <tile gid="3132"/>
+   <tile gid="3133"/>
    <tile/>
    <tile/>
    <tile/>
@@ -8955,6 +8976,10 @@
    <tile/>
    <tile/>
    <tile/>
+   <tile gid="3054"/>
+   <tile gid="3055"/>
+   <tile gid="3056"/>
+   <tile gid="3057"/>
    <tile/>
    <tile/>
    <tile/>
@@ -8965,6 +8990,11 @@
    <tile/>
    <tile/>
    <tile/>
+   <tile gid="3139"/>
+   <tile gid="3140"/>
+   <tile gid="3141"/>
+   <tile gid="3142"/>
+   <tile gid="3143"/>
    <tile/>
    <tile/>
    <tile/>
@@ -8973,6 +9003,11 @@
    <tile/>
    <tile/>
    <tile/>
+   <tile gid="3134"/>
+   <tile gid="3135"/>
+   <tile gid="3136"/>
+   <tile gid="3137"/>
+   <tile gid="3138"/>
    <tile/>
    <tile/>
    <tile/>
@@ -8986,6 +9021,10 @@
    <tile/>
    <tile/>
    <tile/>
+   <tile gid="3064"/>
+   <tile gid="3065"/>
+   <tile gid="3066"/>
+   <tile gid="3067"/>
    <tile/>
    <tile/>
    <tile/>
@@ -9009,6 +9048,11 @@
    <tile/>
    <tile/>
    <tile/>
+   <tile gid="3144"/>
+   <tile gid="3145"/>
+   <tile gid="3146"/>
+   <tile gid="3147"/>
+   <tile gid="3148"/>
    <tile/>
    <tile/>
    <tile/>
@@ -9022,51 +9066,10 @@
    <tile/>
    <tile/>
    <tile/>
-   <tile/>
-   <tile/>
-   <tile/>
-   <tile/>
-   <tile/>
-   <tile/>
-   <tile/>
-   <tile/>
-   <tile/>
-   <tile/>
-   <tile/>
-   <tile/>
-   <tile/>
-   <tile/>
-   <tile/>
-   <tile/>
-   <tile/>
-   <tile/>
-   <tile/>
-   <tile/>
-   <tile/>
-   <tile/>
-   <tile/>
-   <tile/>
-   <tile/>
-   <tile/>
-   <tile/>
-   <tile/>
-   <tile/>
-   <tile/>
-   <tile/>
-   <tile/>
-   <tile/>
-   <tile/>
-   <tile/>
-   <tile/>
-   <tile/>
-   <tile/>
-   <tile/>
-   <tile/>
-   <tile/>
-   <tile/>
-   <tile/>
-   <tile/>
-   <tile/>
+   <tile gid="3074"/>
+   <tile gid="3075"/>
+   <tile gid="3076"/>
+   <tile gid="3077"/>
    <tile/>
    <tile/>
    <tile/>

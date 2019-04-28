@@ -4,6 +4,9 @@ import View.Sprite;
 
 import java.awt.*;
 
+/*
+    The boss is the final enemy of the game
+ */
 public class Boss extends Enemy {
 
     private int shootTimer = 0;
@@ -52,6 +55,7 @@ public class Boss extends Enemy {
 
     public void tick(){
         super.tick();
+        //Shoots a burst of 5 sets of bullet circles, before waiting for a bit
         if(shootBurstCounter < burstAmount) {
             if (shootTimer >= burstCooldown) {
                 shootTimer = 0;
@@ -85,6 +89,8 @@ public class Boss extends Enemy {
         sprite = right;
     }
 
+
+    //Shoots in a cirle around the boss
     public void shoot(){
         soundList.add(shootSound);
         //projectileList.add(new Ball(x,y, 1,1));

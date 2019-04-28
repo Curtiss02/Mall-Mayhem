@@ -2,7 +2,9 @@ package View;
 
 import javax.swing.*;
 import java.awt.*;
-
+/*
+    The game fram houses the main GUIPanel
+ */
 public class GameFrame extends JFrame {
 
     public GUIPanel myGUIPanel;

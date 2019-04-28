@@ -12,6 +12,11 @@ public class BossLevel extends Level {
         playerStart = new Point(19*32, 26 * 32);
 
         map = new Map("maps/BossLevel.xml");
+
+        pickupList.add( new Pickup(42*32, 5*32, Pickup.TYPE.HEALTH));
+        pickupList.add( new Pickup(40*32, 24*32, Pickup.TYPE.HEALTH));
+        pickupList.add( new Pickup(4*32, 23*32, Pickup.TYPE.HEALTH));
+        pickupList.add( new Pickup(3*32, 6*32, Pickup.TYPE.HEALTH));
         spawnEnemies();
 
         Enemy badBoy = new Boss(576,224);

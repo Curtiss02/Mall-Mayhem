@@ -5,7 +5,9 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-
+/*
+    The TileSet class stores the tilesets used for creating maps
+ */
 public class TileSet {
     private int imageWidth;
     private int imageHeight;

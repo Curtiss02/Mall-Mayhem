@@ -3,7 +3,9 @@ package Model;
 import View.Sprite;
 
 import java.awt.*;
-
+/*
+    Pickups are used to provide some sort of effect to the player, either supershot or adding health
+ */
 public class Pickup {
     private int x, y;
     private Sprite sprite;

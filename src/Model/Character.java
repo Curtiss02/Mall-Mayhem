@@ -5,7 +5,14 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/*
+    The character class is the base class of all on screen entities.
+
+
+ */
+
 public abstract class Character {
+
     protected double y;
     protected double x;
     protected double dx, dy;
@@ -100,12 +107,15 @@ public abstract class Character {
     public static List<Projectile> getProjectileList() {
         return projectileList;
     }
+
     public Rectangle getFutureBoundsY(){
         return new Rectangle((int)(x), (int)(y + dy), width, height);
     }
+
     public Rectangle getFutureBoundsX(){
         return new Rectangle((int)(x+dx), (int)(y), width, height);
     }
+
     public void stopY(){
         dy = 0;
     }
